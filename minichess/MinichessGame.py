@@ -86,7 +86,7 @@ class MinichessGame(Game):
                     # A promotion is defaulted to Queen
                     # underpromotions are integer representations of the piece -
                     # 4 = Rook, 3 = Bishop, 2 = Knight
-                    underpromotions = [5, 3, 2]
+                    underpromotions = [5, 4, 3, 2]
 
                     # White promotion
                     if r == rows - 2:
@@ -96,7 +96,7 @@ class MinichessGame(Game):
                                     action_dict[((r, c), (0, new_c, piece))] = index
                                     index += 1
                     # Black promotion
-                    underpromotions = [-5, -3, -2]
+                    underpromotions = [-5, -4, -3, -2]
                     if r == 1:
                         for new_c in range(c - 1, c + 2):
                             if new_c >= 0 and new_c < cols:

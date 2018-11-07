@@ -30,3 +30,12 @@ print(board)
 
 # deep copy
 new_board = np.copy(board)
+
+promotions = [2, 3, 4, 5, None]
+
+print(promotions)
+
+test_set1 = {'a', 'b'}
+test_set2 = {'c', 'd'}
+
+print(test_set2 | test_set1)
