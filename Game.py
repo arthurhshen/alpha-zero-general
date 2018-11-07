@@ -8,6 +8,7 @@ class Game():
 
     See othello/OthelloGame.py for an example implementation.
     """
+
     def __init__(self):
         pass
 
@@ -68,7 +69,7 @@ class Game():
         Returns:
             r: 0 if game has not ended. 1 if player won, -1 if player lost,
                small non-zero value for draw.
-               
+
         """
         pass
 
@@ -84,7 +85,8 @@ class Game():
                             the canonical form can be chosen to be from the pov
                             of white. When the player is white, we can return
                             board as is. When the player is black, we can invert
-                            the colors and return the board.
+                            the colors and return the board. -- that's not true for
+                            chess - we need to reverse the coordinates too 
         """
         pass
 
