@@ -144,7 +144,7 @@ class MinichessGame(Game):
         # Board is a numpy array of the current board state.
 
         b = Board()
-        b.board = board
+        b.board = np.copy(board)
 
         new_board = b.make_move(action, player)
 
@@ -172,7 +172,60 @@ class MinichessGame(Game):
         board = np.flip(board, 0) * -1
         return(board)
 
+    def stringRepresentation(self, board):
+        # 8x8 numpy array (canonical board)
+        return board.tostring()
 
+    def getSymmetries(self, board, pi):
+        # mirror, rotational
+        return()
+
+    def getValidMoves(self, board, player):
+        """
+        Input:
+            board: current board
+            player: current player
+
+        Returns:
+            validMoves: a binary vector of length self.getActionSize(), 1 for
+                        moves that are valid from the current board and player,
+                        0 for invalid moves
+        """
+        valid_moves = [0] * self.getActionSize()
+        b = Board()
+        b.board = np.copy(board)
+
+        moves = b.get_legal_moves(player)
+        for move in moves:
+            valid_moves[self.action_dict[move]] = 1
+
+        return(valid_moves)
+
+    def getGameEnded(self, board, player):
+        """
+        Input:
+            board: current board
+            player: current player (1 or -1)
+
+        Returns:
+            r: 0 if game has not ended. 1 if player won, -1 if player lost,
+               small non-zero value for draw.
+
+        """
+        b = Board()
+        b.board = np.copy(board)
+        if len(b.get_legal_moves(player)) > 0:
+            return(0)
+        else:
+            # is checkmate
+            if (b._is_check(board, player)):
+                return(-1)
+            # stalemate
+            else:
+                return(0.0001)
+
+
+'''
 test = MinichessGame(5, 5)
 # print(test.action_size)
 
@@ -200,3 +253,4 @@ for key in test.action_dict:
     #    print("Val: {}\tGoes to: {}".format(val, key[1]))
 
 # print("max index: {}".format(max_index))
+'''

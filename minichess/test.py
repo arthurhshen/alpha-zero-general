@@ -20,8 +20,10 @@ for i in range(dim[0]):
         board[i] = [0] * dim[1]
 
 board = np.array(board)
-# print(board)
 
+print(board.tostring())
+# print(board)
+'''
 print(board)
 
 board = np.flip(board, 0) * -1
@@ -45,3 +47,4 @@ elements = {(1, 1, 1), (2, 3, 7), (3, 5, 10)}
 print((1, 1, 1) in elements)
 
 print(set([x[1] for x in elements]))
+'''

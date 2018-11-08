@@ -24,7 +24,7 @@ class Board():
     # White is positive, black is negative (ex: -4 is a black rook, 3 is a white bishop)
 
     # pass in tuple of # of rows and # of columns (ranks and files)
-    def __init__(self, dim_tuple):
+    def __init__(self, dim_tuple=(5, 5)):
         self.dim = dim_tuple
         # Create the empty board array of dimensions r x c with pieces.
         # Empty square is 0
@@ -402,10 +402,6 @@ class Board():
                 moves.add(((row, col), (new_r, new_c)))
 
         return(moves)
-
-    def has_legal_moves(self, color):
-
-        pass
 
 
 # testBoard = Board((5, 5))
