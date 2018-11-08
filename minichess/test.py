@@ -36,6 +36,12 @@ promotions = [2, 3, 4, 5, None]
 print(promotions)
 
 test_set1 = {'a', 'b'}
-test_set2 = {'c', 'd'}
+test_set2 = set()
 
 print(test_set2 | test_set1)
+
+elements = {(1, 1, 1), (2, 3, 7), (3, 5, 10)}
+
+print((1, 1, 1) in elements)
+
+print(set([x[1] for x in elements]))

@@ -1,16 +1,4 @@
 '''
-Author: Eric P. Nichols
-Date: Feb 8, 2008.
-Board class.
-Board data:
-  1=white, -1=black, 0=empty
-  first dim is column , 2nd is row:
-     pieces[1][7] is the square in column 2,
-     at the opposite end of the board in row 8.
-Squares are stored and manipulated as (x,y) tuples.
-x is the column, y is the row.
-
-
 # Note: Pawns cannot move 2 squares forward, and therefore there en passant is not a rule.
 # There is no castling.
 
@@ -26,7 +14,9 @@ x is the column, y is the row.
 
 # used to iterate for bishops/rooks/queens along diagonals/ranks/files until we
 # find either a piece of the opposite color, or a piece of our own color.
-from itertools import takewhile
+# from itertools import takewhile
+
+import numpy as np
 
 
 class Board():
@@ -35,8 +25,6 @@ class Board():
 
     # pass in tuple of # of rows and # of columns (ranks and files)
     def __init__(self, dim_tuple):
-        # Intializes configuration
-
         self.dim = dim_tuple
         # Create the empty board array of dimensions r x c with pieces.
         # Empty square is 0
@@ -51,9 +39,10 @@ class Board():
             elif (i == self.dim[0] - 2):
                 self.board[i] = [-1] * self.dim[1]
             elif (i == self.dim[0] - 1):
+                # Create all the black pieces here: R, N, B, Q, K
                 self.board[i] = [-4, -2, -3, -5, -6]
-                # Create all the white pieces here: R, N, B, Q, K
             else:
+                # Empty squares
                 self.board[i] = [0] * self.dim[1]
 
                 # Set up the initial pieces.
@@ -62,25 +51,68 @@ class Board():
     def __getitem__(self, index):
         return self.board[index]
 
-    def get_legal_moves(self, color):
-        """Returns all the legal moves for the given color.
+    def make_move(self, move, player):
+        # executes 'move' for 'player' and returns the new board - does NOT update self.board
+        start_square = move[0]
+        end_square = move[1]
+
+        piece = self.board[start_square[0]][start_square[1]]
+        # Ensure that the piece being moved is of the correct color/not an empty square
+        assert(piece * player > 0)
+
+        # If the piece is a pawn, we may have to deal with underpromotions
+        if abs(piece) == 1:
+
+            # promotion:
+            if player == 1:
+                if (end_square[0] == self.dim[0]):
+                    # promotion defaults to a queen
+                    if len(end_square) == 2:
+                        piece = 5
+                    # underpromtion
+                    else:
+                        piece = end_square[2]
+            # player = -1
+            else:
+                if (end_square[0] == 0):
+                    # promotion default to (black) queen
+                    if len(end_square) == 2:
+                        piece = -5
+                # underpromotion
+                    else:
+                        piece = end_square[2]
+
+        new_board = np.copy(self.board)
+        new_board[end_square[0]][end_square[1]] = piece
+        new_board[start_square[0]][start_square[1]] = 0
+
+        return(new_board)
+
+    def get_legal_moves(self, player):
+        """Returns all the legal moves for the given color - .
         (1 for white, -1 for black
         """
         moves = set()  # stores the legal moves.
+        rows, cols = self.dim
+
+        for r in range(rows):
+            for c in range(cols):
+                piece = self.board[r][c]
+                if player * piece > 0:
+                    moves = moves | self._get_moves_for_piece(r, c, player)
 
         return(moves)
 
-    def _get_moves_for_piece(self, row, col):
-
+    def _get_moves_for_piece(self, row, col, player):
         # Note: assume that a new board is created every time we check this, and
         # self.board is updated to contain the new board.
 
         piece = self.board[row][col]
 
-        if piece == 0:
-            return
+        if player * piece <= 0:
+            return(set())
 
-        player = 1 if piece > 0 else -1
+        # player = 1 if piece > 0 else -1
 
         piece = abs(piece)
         if piece == 1:
@@ -103,7 +135,7 @@ class Board():
 
         return(moves)
 
-    def _check_square(self, new_row, new_col, player):
+    def _check_square(self, orig_row, orig_col, new_row, new_col, player):
         # Returns True if the player can move a piece to the square
         # (new_row, new_col) and False if the square is occupied by
         # a piece of the same color or is an invalid square
@@ -116,13 +148,46 @@ class Board():
         if player * square > 0:
             return(False)
 
+        # make sure the position is not check
+        new_board = self.make_move(((orig_row, orig_col), (new_row, new_col)), player)
+        if self._is_check(new_board, player):
+            return(False)
+
         return(True)
 
+    def _is_check(self, curr_board, player):
+        # Returns true if 'player' is in check
+        # Find all squares that the opposite color controls. Also find the
+        # square with the 'player' king. If the square with 'player' king
+        # is in the set of squares that the opposite color controls, return
+        # True
+
+        # The way this is currently written: If a king moves and there's a
+        # discovered check, and the king is moving to a square that is
+        # controlled, that move will be counted as legal. Since this happens
+        # so rarely, we can fix this later by adding a flag to _check_squares
+        # that determines whether or not to check if the position is check
+
+        # create a new board object for the curr_board's position
+        temp_b = Board()
+        temp_b.board = curr_board
+
+        rows, cols = self.dim
+        king_loc = None
+        controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player))
+
+        # find king's location
+        for r in range(rows):
+            for c in range(cols):
+                if temp_b.board[r][c] * player == 6:
+                    king_loc = (r, c)
+
+        if king_loc in controlled_squares:
+            return(True)
+
+        return(False)
+
     def _get_moves_for_pawn(self, row, col, player):
-        # TODO:
-        # REMOVE ALL SQUARES THAT CONTAIN A PIECE OF 'PLAYER' COLOR -
-        # can check this by multiplying piece by player and checking
-        # if that value is greater than 0
         moves = set()
         # promotions
         promotion = False
@@ -142,7 +207,7 @@ class Board():
             # same color
             # Since pawns only move forwards - add player (1 or -1) to row
             new_r = row + player
-            if self._check_square(new_r, new_c, player):
+            if self._check_square(row, col, new_r, new_c, player):
                 moves.add(((row, col), (new_r, new_c)))
                 if promotion:
                     for piece in under_promotions:
@@ -151,10 +216,6 @@ class Board():
         return(moves)
 
     def _get_moves_for_knight(self, row, col, player):
-        # TODO:
-        # REMOVE ALL SQUARES THAT CONTAIN A PIECE OF 'PLAYER' COLOR -
-        # can check this by multiplying piece by player and checking
-        # if that value is greater than 0
         moves = set()
 
         new_indices = [
@@ -169,7 +230,7 @@ class Board():
         ]
 
         for new_r, new_c in new_indices:
-            if self._check_square(new_r, new_c, player):
+            if self._check_square(row, col, new_r, new_c, player):
                 moves.add(((row, col), (new_r, new_c)))
 
         return(moves)
@@ -191,7 +252,7 @@ class Board():
                 new_r = row + offset
                 new_c = col + offset
 
-                if self._check_square(new_r, new_c, player):
+                if self._check_square(row, col, new_r, new_c, player):
                     moves.add(((row, col), (new_r, new_c)))
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
@@ -207,7 +268,7 @@ class Board():
                 new_r = row + offset
                 new_c = col - offset
 
-                if self._check_square(new_r, new_c, player):
+                if self._check_square(row, col, new_r, new_c, player):
                     moves.add(((row, col), (new_r, new_c)))
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
@@ -222,7 +283,7 @@ class Board():
                 new_r = row - offset
                 new_c = col + offset
 
-                if self._check_square(new_r, new_c, player):
+                if self._check_square(row, col, new_r, new_c, player):
                     moves.add(((row, col), (new_r, new_c)))
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
@@ -237,7 +298,7 @@ class Board():
                 new_r = row - offset
                 new_c = col - offset
 
-                if self._check_square(new_r, new_c, player):
+                if self._check_square(row, col, new_r, new_c, player):
                     moves.add(((row, col), (new_r, new_c)))
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
@@ -264,7 +325,7 @@ class Board():
             if up:
                 new_r = row + offset
 
-                if self._check_square(new_r, col, player):
+                if self._check_square(row, col, new_r, col, player):
                     moves.add(((row, col), (new_r, col)))
                     if self.board[new_r][col] != 0:
                         # If the square contains a piece that is captured, then we can no longer
@@ -277,7 +338,7 @@ class Board():
             if down:
                 new_r = row - offset
 
-                if self._check_square(new_r, col, player):
+                if self._check_square(row, col, new_r, col, player):
                     moves.add(((row, col), (new_r, col)))
                     if self.board[new_r][col] != 0:
                         # If the square contains a piece that is captured, then we can no longer
@@ -290,7 +351,7 @@ class Board():
 
             if left:
                 new_c = col - offset
-                if self._check_square(row, new_c, player):
+                if self._check_square(row, col, row, new_c, player):
                     moves.add(((row, col), (row, new_c)))
                     if self.board[row][new_c] != 0:
                         # If the square contains a piece that is captured, then we can no longer
@@ -303,7 +364,7 @@ class Board():
 
             if right:
                 new_c = col + offset
-                if self._check_square(row, new_c, player):
+                if self._check_square(row, col, row, new_c, player):
                     moves.add(((row, col), (row, new_c)))
                     if self.board[row][new_c] != 0:
                         # If the square contains a piece that is captured, then we can no longer
@@ -323,9 +384,27 @@ class Board():
         return(moves)
 
     def _get_moves_for_king(self, row, col, player):
-        pass
+        moves = set()
+
+        new_indices = [
+            (row + 1, col + 1),
+            (row + 1, col - 1),
+            (row + 1, col + 0),
+            (row - 1, col + 1),
+            (row - 1, col - 1),
+            (row - 1, col + 0),
+            (row + 0, col + 1),
+            (row + 0, col - 1)
+        ]
+
+        for new_r, new_c in new_indices:
+            if self._check_square(row, col, new_r, new_c, player):
+                moves.add(((row, col), (new_r, new_c)))
+
+        return(moves)
 
     def has_legal_moves(self, color):
+
         pass
 
 

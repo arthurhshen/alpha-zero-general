@@ -142,39 +142,13 @@ class MinichessGame(Game):
 
         # Action is in the format ((start square), (end square))
         # Board is a numpy array of the current board state.
-        start_square = action[0]
-        end_square = action[1]
 
-        piece = board[start_square[0]][start_square[1]]
-        # Ensure that the piece being moved is of the correct color/not an empty square
-        assert(piece * player > 0)
+        b = Board()
+        b.board = board
 
-        # If the piece is a pawn, we may have to deal with underpromotions
-        if abs(piece) == 1:
+        new_board = b.make_move(action, player)
 
-            # promotion:
-            if player == 1:
-                if (end_square[0] == self.dim[0]):
-                    # promotion defaults to a queen
-                    if len(end_square) == 2:
-                        piece = 5
-                    # underpromtion
-                    else:
-                        piece = end_square[2]
-            # player = -1
-            else:
-                if (end_square[0] == 0):
-                    # promotion default to (black) queen
-                    if len(end_square) == 2:
-                        piece = -5
-                # underpromotion
-                    else:
-                        piece = end_square[2]
-
-        board[end_square[0]][end_square[1]] = piece
-        board[start_square[0]][start_square[1]] = 0
-
-        return(board, -player)
+        return(new_board, -player)
 
     def getCanonicalForm(self, board, player):
         """
