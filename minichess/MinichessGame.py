@@ -2,7 +2,7 @@ import sys
 # Sets the path to the general alpha-zero folder
 sys.path.append('..')
 from Game import Game
-from MinichessLogic import Board
+from .MinichessLogic import Board
 import numpy as np
 
 
