@@ -2,7 +2,8 @@ import sys
 # Sets the path to the general alpha-zero folder
 sys.path.append('..')
 from Game import Game
-from .MinichessLogic import Board
+# from .MinichessLogic import Board
+from MinichessLogic import Board
 import numpy as np
 
 
@@ -14,6 +15,7 @@ class MinichessGame(Game):
         def getActionDict():
             # action_dict stores tuples of actions in the form ( (start_square), (end_square) )
             action_dict = {}
+            index_dict = {}
             rows, cols = self.dim
             index = 0
             # TODO:
@@ -31,6 +33,7 @@ class MinichessGame(Game):
                         if new_c == c:
                             continue
                         action_dict[((r, c), (r, new_c))] = index
+                        index_dict[index] = ((r, c), (r, new_c))
                         index += 1
 
                     # Up and down Rook moves
@@ -38,6 +41,7 @@ class MinichessGame(Game):
                         if new_r == r:
                             continue
                         action_dict[((r, c), (new_r, c))] = index
+                        index_dict[index] = ((r, c), (new_r, c))
                         index += 1
 
                     # Bishop moves
@@ -52,9 +56,11 @@ class MinichessGame(Game):
 
                         if (new_left_c >= 0):
                             action_dict[((r, c), (new_r, new_left_c))] = index
+                            index_dict[index] = ((r, c), (new_r, new_left_c))
                             index += 1
                         if (new_right_c < cols):
                             action_dict[((r, c), (new_r, new_right_c))] = index
+                            index_dict[index] = ((r, c), (new_r, new_right_c))
                             index += 1
 
                     # Knight moves:
@@ -80,6 +86,7 @@ class MinichessGame(Game):
                         if new_r < 0 or new_r >= rows or new_c < 0 or new_c >= cols:
                             continue
                         action_dict[((r, c), (new_r, new_c))] = index
+                        index_dict[index] = ((r, c), (new_r, new_c))
                         index += 1
 
                     # Add promotions to the action_dict
@@ -93,7 +100,8 @@ class MinichessGame(Game):
                         for new_c in range(c - 1, c + 2):
                             if new_c >= 0 and new_c < cols:
                                 for piece in underpromotions:
-                                    action_dict[((r, c), (0, new_c, piece))] = index
+                                    action_dict[((r, c), (rows - 1, new_c, piece))] = index
+                                    index_dict[index] = ((r, c), (rows - 1, new_c, piece))
                                     index += 1
                     # Black promotion
                     underpromotions = [-5, -4, -3, -2]
@@ -102,11 +110,13 @@ class MinichessGame(Game):
                             if new_c >= 0 and new_c < cols:
                                 for piece in underpromotions:
                                     action_dict[((r, c), (0, new_c, piece))] = index
+                                    index_dict[index] = ((r, c), (0, new_c, piece))
                                     index += 1
 
-            return(action_dict)
+            return((action_dict, index_dict))
 
-        self.action_dict = getActionDict()
+        self.action_dict, self.index_dict = getActionDict()
+
         self.action_size = len(self.action_dict)
 
     def getInitBoard(self):
@@ -145,6 +155,10 @@ class MinichessGame(Game):
 
         b = Board()
         b.board = np.copy(board)
+
+        # in MCTS.py - the action passed in is an integer representing the index of a valid move
+        if (isinstance(action, int)):
+            action = self.index_dict[action]
 
         new_board = b.make_move(action, player)
 
@@ -223,6 +237,28 @@ class MinichessGame(Game):
             # stalemate
             else:
                 return(0.0001)
+
+
+test = MinichessGame(5, 5)
+
+valids = test.getValidMoves(test.getInitBoard(), 1)
+
+count = 0
+moves = set()
+for v in valids:
+    if v == 0:
+        count += 1
+        continue
+    else:
+        moves.add(test.index_dict[count])
+        count += 1
+
+for m in moves:
+    print(m)
+
+test_board = np.array([[], [], [], [], []])
+
+print(test.getInitBoard())
 
 
 '''

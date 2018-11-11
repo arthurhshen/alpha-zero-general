@@ -17,6 +17,8 @@
 # from itertools import takewhile
 
 import numpy as np
+# For debugging/sleeping
+import time
 
 
 class Board():
@@ -53,15 +55,23 @@ class Board():
 
     def make_move(self, move, player):
         # executes 'move' for 'player' and returns the new board - does NOT update self.board
-        print("Move: {}".format(move))
-        print("Type: {}".format(type(move)))
-        # print(move)
+        # print("Move: {}".format(move))
+        # print("Type: {}".format(type(move)))
+
         start_square = move[0]
         end_square = move[1]
 
         piece = self.board[start_square[0]][start_square[1]]
         # Ensure that the piece being moved is of the correct color/not an empty square
-        assert(piece * player > 0)
+
+        try:
+            assert(piece * player > 0)
+        except AssertionError:
+            print(piece)
+            print(player)
+            print(self.board)
+            print(move)
+            time.sleep(100)
 
         # If the piece is a pawn, we may have to deal with underpromotions
         if abs(piece) == 1:
@@ -212,7 +222,15 @@ class Board():
             # same color
             # Since pawns only move forwards - add player (1 or -1) to row
             new_r = row + player
-            if self._check_square(row, col, new_r, new_c, player, check_checks):
+
+            # for captures:
+            is_piece = True
+
+            if (new_c != col):
+                if self.board[new_r][new_c] * player <= 0:
+                    is_piece = False
+
+            if is_piece and self._check_square(row, col, new_r, new_c, player, check_checks):
                 moves.add(((row, col), (new_r, new_c)))
                 if promotion:
                     for piece in under_promotions:
@@ -336,10 +354,10 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         up = False
-                    else:
-                        # Either the file has ended (no longer on the board) or there is a
-                        # piece of 'player' color in the way
-                        up = False
+                else:
+                    # Either the file has ended (no longer on the board) or there is a
+                    # piece of 'player' color in the way
+                    up = False
             if down:
                 new_r = row - offset
 
@@ -349,10 +367,10 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         down = False
-                    else:
-                        # Either the file has ended (no longer on the board) or there is a
-                        # piece of 'player' color in the way
-                        down = False
+                else:
+                    # Either the file has ended (no longer on the board) or there is a
+                    # piece of 'player' color in the way
+                    down = False
 
             if left:
                 new_c = col - offset
@@ -362,10 +380,10 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the rank, so set flag = False
                         left = False
-                    else:
-                        # Either the rank has ended (no longer on the board) or there is a
-                        # piece of 'player' color in the way
-                        left = False
+                else:
+                    # Either the rank has ended (no longer on the board) or there is a
+                    # piece of 'player' color in the way
+                    left = False
 
             if right:
                 new_c = col + offset
@@ -375,10 +393,10 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the diagonal, so set flag = False
                         right = False
-                    else:
-                        # Either the rank has ended (no longer on the board) or there is a
-                        # piece of 'player' color in the way
-                        right = False
+                else:
+                    # Either the rank has ended (no longer on the board) or there is a
+                    # piece of 'player' color in the way
+                    right = False
 
         return(moves)
 
