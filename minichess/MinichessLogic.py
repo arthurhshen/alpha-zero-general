@@ -78,7 +78,7 @@ class Board():
 
             # promotion:
             if player == 1:
-                if (end_square[0] == self.dim[0]):
+                if (end_square[0] == self.dim[0] - 1):
                     # promotion defaults to a queen
                     if len(end_square) == 2:
                         piece = 5
@@ -203,6 +203,7 @@ class Board():
         return(False)
 
     def _get_moves_for_pawn(self, row, col, player, check_checks=True):
+        rows, cols = self.dim
         moves = set()
         # promotions
         promotion = False
@@ -227,6 +228,8 @@ class Board():
             is_piece = True
 
             if (new_c != col):
+                if new_c >= cols or new_c < 0:
+                    continue
                 if self.board[new_r][new_c] * player <= 0:
                     is_piece = False
 

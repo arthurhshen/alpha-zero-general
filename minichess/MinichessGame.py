@@ -3,7 +3,7 @@ import sys
 sys.path.append('..')
 from Game import Game
 # from .MinichessLogic import Board
-from MinichessLogic import Board
+from .MinichessLogic import Board
 import numpy as np
 
 
@@ -160,7 +160,9 @@ class MinichessGame(Game):
         if (isinstance(action, int)):
             action = self.index_dict[action]
 
-        new_board = b.make_move(action, player)
+        # new_board = b.make_move(action, player)
+        # MCTS uses getCanonicalForm - always looks at the board from white's perspective - hard code 1
+        new_board = b.make_move(action, 1)
 
         return(new_board, -player)
 
@@ -239,6 +241,8 @@ class MinichessGame(Game):
                 return(0.0001)
 
 
+'''
+
 test = MinichessGame(5, 5)
 
 valids = test.getValidMoves(test.getInitBoard(), 1)
@@ -260,7 +264,7 @@ test_board = np.array([[], [], [], [], []])
 
 print(test.getInitBoard())
 
-
+'''
 '''
 test = MinichessGame(5, 5)
 # print(test.action_size)
