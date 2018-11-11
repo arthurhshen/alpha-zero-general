@@ -63,16 +63,16 @@ class Board():
 
         piece = self.board[start_square[0]][start_square[1]]
         # Ensure that the piece being moved is of the correct color/not an empty square
-
+        '''
         try:
             assert(piece * player > 0)
         except AssertionError:
-            print(piece)
-            print(player)
+            print("Piece: ", piece)
+            print("Player: ", player)
             print(self.board)
-            print(move)
+            print(move) 
             time.sleep(100)
-
+        '''
         # If the piece is a pawn, we may have to deal with underpromotions
         if abs(piece) == 1:
 
