@@ -154,7 +154,9 @@ class MinichessGame(Game):
         # Board is a numpy array of the current board state.
 
         b = Board()
-        b.board = np.copy(board)
+
+        b.board = self.getCanonicalForm(board, player)
+
 
         # in MCTS.py - the action passed in is an integer representing the index of a valid move
         if (isinstance(action, int)):
@@ -164,6 +166,9 @@ class MinichessGame(Game):
         # MCTS uses getCanonicalForm - always looks at the board from white's perspective - hard code 1
         # new_board = b.make_move(action, 1)
         # print(new_board)
+
+        # need to flip again to ensure that the board returned does not cause double turns for one player
+        new_board = self.getCanonicalForm(new_board, player)
 
         return(new_board, -player)
 

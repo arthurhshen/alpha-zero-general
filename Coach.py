@@ -54,16 +54,17 @@ class Coach():
             for b,p in sym:
                 trainExamples.append([b, self.curPlayer, p, None])
             print("\n========NEW MOVE=========")
+            print("player: ", self.curPlayer)
             print("current board:")
-            print(self.game.display(canonicalBoard))
+            print(self.game.display(board))
             action = np.random.choice(len(pi), p=pi)
             print("action: ")
             print(self.game.index_dict[action])
             # orig
-            # board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
 
-            board, _ = self.game.getNextState(canonicalBoard, 1, action)
-            self.curPlayer = -self.curPlayer
+            #board, _ = self.game.getNextState(canonicalBoard, 1, action)
+            #self.curPlayer = -self.curPlayer
 
 
             print("new board:")
