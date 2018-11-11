@@ -58,7 +58,7 @@ class Board():
         # print("Move: {}".format(move))
         # print("Type: {}".format(type(move)))
 
-        player = 1
+        # player = 1
 
         start_square = move[0]
         end_square = move[1]
@@ -108,7 +108,7 @@ class Board():
         (1 for white, -1 for black
         """
 
-        player = 1
+        # player = 1
 
         moves = set()  # stores the legal moves.
         rows, cols = self.dim

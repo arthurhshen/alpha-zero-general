@@ -6,6 +6,9 @@ from Game import Game
 from .MinichessLogic import Board
 import numpy as np
 
+# For debugging
+import time
+
 
 class MinichessGame(Game):
     def __init__(self, r, c):
@@ -153,6 +156,14 @@ class MinichessGame(Game):
         # Action is in the format ((start square), (end square))
         # Board is a numpy array of the current board state.
 
+        try:
+            assert(player == 1)
+        except AssertionError:
+            print("player: {}".format(player))
+            print(self.index_dict[action])
+            print(board)
+            time.sleep(100)
+
         b = Board()
         b.board = np.copy(board)
 
@@ -162,8 +173,9 @@ class MinichessGame(Game):
 
         # new_board = b.make_move(action, player)
         # MCTS uses getCanonicalForm - always looks at the board from white's perspective - hard code 1
-        new_board = b.make_move(action, 1)
+        new_board = b.make_move(action, player)
 
+        # return(new_board, -player)
         return(new_board, -player)
 
     def getCanonicalForm(self, board, player):
@@ -193,8 +205,9 @@ class MinichessGame(Game):
         return board.tostring()
 
     def getSymmetries(self, board, pi):
-        # mirror, rotational
-        return()
+        # This version of chess is left/right board symmetric (since there is no castling)
+        """Board is left/right board symmetric"""
+        return [(board, pi), (board[:, ::-1], pi[::-1])]
 
     def getValidMoves(self, board, player):
         """
@@ -207,6 +220,9 @@ class MinichessGame(Game):
                         moves that are valid from the current board and player,
                         0 for invalid moves
         """
+
+        # player = 1
+
         valid_moves = [0] * self.getActionSize()
         b = Board()
         b.board = np.copy(board)
