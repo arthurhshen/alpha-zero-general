@@ -58,6 +58,8 @@ class Board():
         # print("Move: {}".format(move))
         # print("Type: {}".format(type(move)))
 
+        player = 1
+
         start_square = move[0]
         end_square = move[1]
 
@@ -105,6 +107,9 @@ class Board():
         """Returns all the legal moves for the given color - .
         (1 for white, -1 for black
         """
+
+        player = 1
+
         moves = set()  # stores the legal moves.
         rows, cols = self.dim
 
@@ -231,6 +236,10 @@ class Board():
                 if new_c >= cols or new_c < 0:
                     continue
                 if self.board[new_r][new_c] * player <= 0:
+                    is_piece = False
+
+            if (new_c == col):
+                if self.board[new_r][new_c] != 0:
                     is_piece = False
 
             if is_piece and self._check_square(row, col, new_r, new_c, player, check_checks):
