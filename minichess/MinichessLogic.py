@@ -233,6 +233,10 @@ class Board():
                 if self.board[new_r][new_c] * player <= 0:
                     is_piece = False
 
+            if (new_c == col):
+                if self.board[new_r][new_c] != 0:
+                    is_piece = False
+
             if is_piece and self._check_square(row, col, new_r, new_c, player, check_checks):
                 moves.add(((row, col), (new_r, new_c)))
                 if promotion:
