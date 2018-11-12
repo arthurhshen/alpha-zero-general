@@ -58,9 +58,9 @@ def alphabeta_min_node(board, player, alpha, beta, level, limit):
         return ans
 
     v = float("inf")
+    
     # sort moves based on associated utility value for result board
-    moves.sort()
-    #moves.sort(key=lambda x:compute_utility(play_move(board, color, x[0], x[1]), color))
+    moves.sort(key=lambda x:compute_utility(board.make_move(board, player)[0], player), reverse=True)
     
     for move in moves:
         state,_ = board.make_move(move, opponent)
@@ -98,7 +98,7 @@ def alphabeta_max_node(board, player, alpha, beta, level, limit):
 
     v = float("-inf")
     # sort moves based on associated utility value for result board    
-    moves.sort(key=lambda x:compute_utility(board.make_move(board, player), player), reverse=True)
+    moves.sort(key=lambda x:compute_utility(board.make_move(board, player)[0], player), reverse=True)
     
     for move in moves:
         state,_ = board.make_move(move, color)
@@ -125,8 +125,7 @@ def select_move_alphabeta(board, player):
     minimax_val = float("-inf")
 
     # sort moves based on associated utility value for result board
-    moves.sort()
-    #moves.sort(key=lambda x:compute_utility(make_move(), color), reverse=True)
+    moves.sort(key=lambda x:compute_utility(board.make_move(board, player)[0], player), reverse=True)
     
     for move in moves:
         state,_ = board.make_move(move, player)
