@@ -16,267 +16,272 @@ import time
 import numpy as np
 
 # You can use the functions in othello_shared to write your AI
-from MinichessLogic import Board
+from .MinichessLogic import Board
 # from MinichessLogic import make_move, get_legal_moves
 
 explored = dict()
 
 
-def compute_utility(board, player):
+class MinimaxPlayer():
 
-    isEnded = getGameEnded(board, player)
-    if abs(isEnded) == 1:
-        if isEnded == -1:
-            return(float('-inf'))
-        return(float('inf'))
+    def __init__(self, game, player):
+        self.game = game
+        self.player = player
 
-    # was a draw
-    if isEnded != 0:
-        return(0)
+    def compute_utility(self, board, player):
+        # print("compute_utility")
+        # print(board)
+        # print(player)
+        isEnded = self.getGameEnded(board, player)
+        if abs(isEnded) == 1:
+            if isEnded == -1:
+                return(float('-inf'))
+            return(float('inf'))
 
-    # Evaluate the position
-    white_mat, black_mat = get_material(board)
+        # was a draw
+        if isEnded != 0:
+            return(0)
 
-    mat_ratio = (white_mat / black_mat - 1) if player == 1 else black_mat / white_mat - 1
+        # Evaluate the position
+        white_mat, black_mat = self.get_material(board)
 
-    b = Board()
-    b.board = np.copy(board)
+        mat_ratio = float('-inf')
 
-    # calculates the total number of legal moves for both the player
-    # and the opponent
-    player_moves = len(b.get_legal_moves(board, player))
-    opponent_moves = len(b.get_legal_moves(board, -player))
+        if white_mat == 0:
+            mat_ratio = black_mat
+        if black_mat == 0:
+            mat_ratio = white_mat
 
-    move_ratio = player_moves / opponent_moves - 1
+        if not mat_ratio >= 0:
+            mat_ratio = (white_mat / black_mat - 1) if player == 1 else black_mat / white_mat - 1
 
-    score = mat_ratio * 5 + move_ratio
+        b = Board()
+        b.board = np.copy(board)
 
-    return(score)
+        # calculates the total number of legal moves for both the player
+        # and the opponent
+        player_moves = len(b.get_legal_moves(player))
+        opponent_moves = len(b.get_legal_moves(-player))
 
-
-def getGameEnded(board, player):
-    """
-    Input:
-        board: current board
-        player: current player (1 or -1)
-
-    Returns:
-        r: 0 if game has not ended. 1 if player won, -1 if player lost,
-           small non-zero value for draw.
-
-    """
-    b = Board()
-    b.board = np.copy(board)
-    if len(b.get_legal_moves(player)) > 0:
-        return(0)
-    else:
-        # is checkmate
-        if (b._is_check(board, player)):
-            return(-1)
-        # stalemate
+        if opponent_moves == 0:
+            move_ratio = player_moves
         else:
-            return(0.0001)
+            move_ratio = player_moves / opponent_moves - 1
 
+        score = mat_ratio * 5 + move_ratio
 
-def get_material(board):
-    '''
-    Material counts (hand designed)
-    pawn: 1
-    bishop: 1.5
-    knight: 2
-    rook: 3
-    Queen: 3.5
+        return(score)
 
-    pawn = 1
-    bishop = 3
-    knight = 2
-    rook = 4
-    queen = 5
-    '''
+    def getGameEnded(self, board, player):
+        """
+        Input:
+            board: current board
+            player: current player (1 or -1)
 
-    mat_dict = {1: 1,
-                2: 2,
-                3: 1.5,
-                4: 3,
-                5: 5,
-                -1: 1,
-                -2: 2,
-                -3: 1.5,
-                -4: 3,
-                -5: 5}
-    white_count = 0
-    black_count = 0
+        Returns:
+            r: 0 if game has not ended. 1 if player won, -1 if player lost,
+               small non-zero value for draw.
 
-    rows, cols = board.shape
-
-    for r in range(rows):
-        for c in range(cols):
-            piece = board[r][c]
-            print(piece)
-            if piece == 0 or abs(piece) == 6:
-                continue
-            if piece < 0:
-                black_count += mat_dict[piece]
+        """
+        b = Board()
+        b.board = np.copy(board)
+        # print("getGameEnded")
+        # print(b.board)
+        if len(b.get_legal_moves(player)) > 0:
+            return(0)
+        else:
+            # is checkmate
+            if (b._is_check(board, player)):
+                return(-1)
+            # stalemate
             else:
-                white_count += mat_dict[piece]
+                return(0.0001)
 
-    return((white_count, black_count))
+    def get_material(self, board):
+        '''
+        Material counts (hand designed)
+        pawn: 1
+        bishop: 1.5
+        knight: 2
+        rook: 3
+        Queen: 4
 
-############ ALPHA-BETA PRUNING #####################
+        pawn = 1
+        bishop = 3
+        knight = 2
+        rook = 4
+        queen = 5
+        '''
 
+        mat_dict = {1: 1,
+                    2: 2,
+                    3: 1.5,
+                    4: 3,
+                    5: 6,
+                    -1: 1,
+                    -2: 2,
+                    -3: 1.5,
+                    -4: 3,
+                    -5: 6}
+        white_count = 0
+        black_count = 0
 
-def alphabeta_min_node(board, player, alpha, beta, level, limit):
-    global explored
+        rows, cols = board.shape
 
-    if player == 1:
-        opponent = -1
-    elif player == -1:
-        opponent = 1
+        for r in range(rows):
+            for c in range(cols):
+                piece = board[r][c]
+                if piece == 0 or abs(piece) == 6:
+                    continue
+                if piece < 0:
+                    black_count += mat_dict[piece]
+                else:
+                    white_count += mat_dict[piece]
 
-    if level >= limit:
-        return compute_utility(board, player)
+        return((white_count, black_count))
 
-    else:
-        level = level + 1
+    ############ ALPHA-BETA PRUNING #####################
 
-    if (board, opponent) in explored:
-        return explored[(board, opponent)]
+    def alphabeta_min_node(self, board, player, alpha, beta, level, limit):
+        global explored
 
-    b = Board()
-    b.board = np.copy(board)
+        if player == 1:
+            opponent = -1
+        elif player == -1:
+            opponent = 1
 
-    moves = b.get_legal_moves(player)
+        if level >= limit:
+            return self.compute_utility(board, player)
 
-    if len(moves) == 0:
-        ans = compute_utility(board, player)
-        return ans
-
-    v = float("inf")
-    # sort moves based on associated utility value for result board
-    moves.sort(key=lambda x: compute_utility(b.make_move(board, player)[0], player))
-
-    for move in moves:
-        state, _ = board.make_move(move, opponent)
-        if (state, opponent) in explored:
-            val = explored[(state, opponent)]
         else:
-            val = alphabeta_max_node(state, player, alpha, beta, level, limit)
-            explored[(state, opponent)] = val
+            level = level + 1
 
-        v = min(v, val)
-        if v <= alpha:
-            return v
+        if (board.tostring(), opponent) in explored:
+            return explored[(board.tostring(), opponent)]
 
-        beta = min(beta, v)
+        b = Board()
+        b.board = np.copy(board)
 
-    return v
+        moves = list(b.get_legal_moves(opponent))
 
+        '''
+        print("----------------------------------------")
+        print("In min_mode, generating possible moves for board for ", opponent)
+        print(b.board)
+        print(moves)
+        print("----------------------------------------")
+        '''
+        if len(moves) == 0:
+            ans = self.compute_utility(board, player)
+            return ans
 
-def alphabeta_max_node(board, player, alpha, beta, level, limit):
-    global explored
+        v = float("inf")
+        # sort moves based on associated utility value for result board
+        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player))
+        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, opponent, x)[0], player))
 
-    if level >= limit:
-        return compute_utility(board, player)
-    else:
-        level = level + 1
+        for move in moves:
+            state = b.make_move(move, opponent)
+            # state = self.game.getNextState(board, opponent, move)[0]
+            if (state.tostring(), opponent) in explored:
+                val = explored[(state.tostring(), opponent)]
+            else:
+                '''
+                print("----------------------------------------")
+                print("In min_mode, sending to max_node")
+                print(state)
+                print(move)
+                print("----------------------------------------")
+                '''
+                val = self.alphabeta_max_node(state, player, alpha, beta, level, limit)
+                explored[(state.tostring(), opponent)] = val
 
-    if (board, player) in explored:
-        return explored[(board, player)]
+            v = min(v, val)
+            if v <= alpha:
+                return v
 
-    b = Board()
-    b.board = np.copy(board)
+            beta = min(beta, v)
 
-    moves = b.get_legal_moves(player)
-    if len(moves) == 0:
-        ans = compute_utility(board, player)
-        return ans
+        return v
 
-    v = float("-inf")
-    # sort moves based on associated utility value for result board
-    moves.sort(key=lambda x: compute_utility(b.make_move(board, player)[0], player), reverse=True)
+    def alphabeta_max_node(self, board, player, alpha, beta, level, limit):
+        global explored
 
-    for move in moves:
-        state, _ = board.make_move(move, player)
-        if (state, player) in explored:
-            val = explored[(state, player)]
+        if level >= limit:
+            return self.compute_utility(board, player)
         else:
-            val = alphabeta_min_node(state, player, alpha, beta, level, limit)
-            explored[(state, player)] = val
+            level = level + 1
 
-        v = max(v, val)
+        if (board.tostring(), player) in explored:
+            return explored[(board.tostring(), player)]
 
-        if v >= beta:
-            return v
+        b = Board()
+        b.board = np.copy(board)
 
-        alpha = max(alpha, v)
-    return v
+        moves = list(b.get_legal_moves(player))
+        if len(moves) == 0:
+            ans = self.compute_utility(board, player)
+            return ans
 
+        v = float("-inf")
+        # sort moves based on associated utility value for result board
+        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player), reverse=True)
+        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, player, x)[0], player), reverse=True)
+        for move in moves:
+            # state = b.make_move(move, player)
+            # state = self.game.getNextState(board, player, move)[0]
+            state = b.make_move(move, player)
+            if (state.tostring(), player) in explored:
+                val = explored[(state.tostring(), player)]
+            else:
+                val = self.alphabeta_min_node(state, player, alpha, beta, level, limit)
+                explored[(state.tostring(), player)] = val
 
-def select_move_alphabeta(board, player):
-    global explored
+            v = max(v, val)
 
-    b = Board()
-    b.board = np.copy(board)
+            if v >= beta:
+                return v
 
-    selected_move = -1
-    moves = b.get_legal_moves(player)
+            alpha = max(alpha, v)
+        return v
 
-    minimax_val = float("-inf")
+    def select_move_alphabeta(self, board):
+        global explored
 
-    # sort moves based on associated utility value for result board
-    moves.sort(key=lambda x: compute_utility(b.make_move(board, player)[0], player), reverse=True)
+        # For our program, the alpha-beta player will always be 1
+        player = self.player
 
-    for move in moves:
-        state, _ = b.make_move(move, player)
-        if (state, player) in explored:
-            u = explored[(state, player)]
-        else:
-            u = alphabeta_min_node(state, player, float("-inf"), float("inf"), 0, 10)
-            explored[(state, player)] = u
-        if u > minimax_val:
-            minimax_val = u
-            selected_move = move
-    return selected_move
+        b = Board()
+        b.board = np.copy(board)
 
+        print("in select_move_alphabeta")
+        print(b.board)
 
-####################################################
-def run_ai():
-    """
-    This function establishes communication with the game manager.
-    It first introduces itself and receives its color.
-    Then it repeatedly receives the current score and current board state
-    until the game is over.
-    """
-    print("Minimax AI")  # First line is the name of this AI
-    color = int(input())  # Then we read the color: 1 for dark (goes first),
-    # 2 for light.
+        selected_move = -1
+        moves = list(b.get_legal_moves(player))
+        print(moves)
+        minimax_val = float("-inf")
 
-    while True:  # This is the main loop
-        # Read in the current game status, for example:
-        # "SCORE 2 2" or "FINAL 33 31" if the game is over.
-        # The first number is the score for player 1 (dark), the second for player 2 (light)
-        next_input = input()
-        status, dark_score_s, light_score_s = next_input.strip().split()
-        dark_score = int(dark_score_s)
-        light_score = int(light_score_s)
-
-        if status == "FINAL":  # Game is over.
-            print
-        else:
-            board = eval(input())  # Read in the input and turn it into a Python
-            # object. The format is a list of rows. The
-            # squares in each row are represented by
-            # 0 : empty square
-            # 1 : dark disk (player 1)
-            # 2 : light disk (player 2)
-
-            # Select the move and send it to the manager
-            movei, movej = select_move_alphabeta(board, color)
-            #movei, movej = select_move_alphabeta(board, color)
-            print("{} {}".format(movei, movej))
-
-
-if __name__ == "__main__":
-    # run_ai()
-    b = Board()
-    print(compute_utility(b.board, 1))
+        # sort moves based on associated utility value for result board
+        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player), reverse=True)
+        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, player, x)[0], player), reverse=True)
+        # print(moves)
+        for move in moves:
+            # state = b.make_move(move, player)
+            # state = self.game.getNextState(board, player, move)[0]
+            state = b.make_move(move, player)
+            if (state.tostring(), player) in explored:
+                u = explored[(state.tostring(), player)]
+            else:
+                print("----------------------------------------")
+                print("Sending this state to be evaluated by alphabeta_min_node")
+                print(state)
+                print("----------------------------------------")
+                u = self.alphabeta_min_node(state, player, float("-inf"), float("inf"), 0, 5)
+                explored[(state.tostring(), player)] = u
+            if u > minimax_val:
+                minimax_val = u
+                selected_move = move
+        print("Selected move: ", selected_move)
+        index = self.game.action_dict[selected_move]
+        return(index)
