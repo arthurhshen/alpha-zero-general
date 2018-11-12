@@ -157,12 +157,11 @@ class MinichessGame(Game):
 
         b.board = self.getCanonicalForm(board, player)
 
-
         # in MCTS.py - the action passed in is an integer representing the index of a valid move
         if (isinstance(action, int)):
             action = self.index_dict[action]
 
-        new_board = b.make_move(action, player)
+        new_board = b.make_move(action, 1)
         # MCTS uses getCanonicalForm - always looks at the board from white's perspective - hard code 1
         # new_board = b.make_move(action, 1)
         # print(new_board)
@@ -188,8 +187,7 @@ class MinichessGame(Game):
                             chess - we need to reverse the coordinates too
         """
         if player == 1:
-           return(board)
-
+            return(board)
 
         # flips the board so the coordinates are correct (for promotion) and multiplies by -1
         board = np.flip(board, 0) * -1
@@ -248,26 +246,26 @@ class MinichessGame(Game):
                 return(0.0001)
 
     def display(self, board):
-        num_to_piece_dict = {0:"  ", 
-        1:"wp", 
-        -1:"bp", 
-        2:"wN",
-        -2:"bN",
-        3:"wB",
-        -3:"bB",
-        4:"wR",
-        -4:"bR",
-        5:"wQ",
-        -5:"bQ",
-        6:"wK",
-        -6:"bK"}
+        num_to_piece_dict = {0: "  ",
+                             1: "wp",
+                             -1: "bp",
+                             2: "wN",
+                             -2: "bN",
+                             3: "wB",
+                             -3: "bB",
+                             4: "wR",
+                             -4: "bR",
+                             5: "wQ",
+                             -5: "bQ",
+                             6: "wK",
+                             -6: "bK"}
 
         rows, cols = self.dim
-        
+
         new_board = []
 
         for r in range(rows):
-            new_board.append([""]*cols)
+            new_board.append([""] * cols)
 
         for r in range(rows):
             for c in range(cols):

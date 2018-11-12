@@ -67,8 +67,8 @@ class Coach():
             #self.curPlayer = -self.curPlayer
 
 
-            print("new board:")
-            print(self.game.display(board))
+            # print("new board:")
+            # print(self.game.display(board))
 
             r = self.game.getGameEnded(board, self.curPlayer)
 

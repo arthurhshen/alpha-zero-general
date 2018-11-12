@@ -63,16 +63,16 @@ class Board():
 
         piece = self.board[start_square[0]][start_square[1]]
         # Ensure that the piece being moved is of the correct color/not an empty square
-        '''
+
         try:
             assert(piece * player > 0)
         except AssertionError:
             print("Piece: ", piece)
             print("Player: ", player)
             print(self.board)
-            print(move) 
+            print(move)
             time.sleep(100)
-        '''
+
         # If the piece is a pawn, we may have to deal with underpromotions
         if abs(piece) == 1:
 
@@ -177,25 +177,21 @@ class Board():
         # is in the set of squares that the opposite color controls, return
         # True
 
-        # The way this is currently written: If a king moves and there's a
-        # discovered check, and the king is moving to a square that is
-        # controlled, that move will be counted as legal. Since this happens
-        # so rarely, we can fix this later by adding a flag to _check_squares
-        # that determines whether or not to check if the position is check
-
         # create a new board object for the curr_board's position
         temp_b = Board()
         temp_b.board = curr_board
 
         rows, cols = self.dim
         king_loc = None
-        controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player, check_checks))
+        # controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player, check_checks))
 
         # find king's location
         for r in range(rows):
             for c in range(cols):
                 if temp_b.board[r][c] * player == 6:
                     king_loc = (r, c)
+
+        #
 
         if king_loc in controlled_squares:
             return(True)
@@ -230,9 +226,10 @@ class Board():
             if (new_c != col):
                 if new_c >= cols or new_c < 0:
                     continue
-                if self.board[new_r][new_c] * player <= 0:
+                if self.board[new_r][new_c] * player >= 0:
                     is_piece = False
 
+            # ensures the square in front of the pawn is empty
             if (new_c == col):
                 if self.board[new_r][new_c] != 0:
                     is_piece = False
