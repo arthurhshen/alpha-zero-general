@@ -47,9 +47,11 @@ class Board():
                 # Empty squares
                 self.board[i] = [0] * self.dim[1]
 
-                # Set up the initial pieces.
+        self.board = np.array(self.board)
 
-                # add [][] indexer syntax to the Board
+        # Set up the initial pieces.
+
+        # add [][] indexer syntax to the Board
     def __getitem__(self, index):
         return self.board[index]
 
