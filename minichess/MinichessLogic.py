@@ -183,15 +183,13 @@ class Board():
 
         rows, cols = self.dim
         king_loc = None
-        # controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player, check_checks))
+        controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player, check_checks))
 
         # find king's location
         for r in range(rows):
             for c in range(cols):
                 if temp_b.board[r][c] * player == 6:
                     king_loc = (r, c)
-
-        #
 
         if king_loc in controlled_squares:
             return(True)
