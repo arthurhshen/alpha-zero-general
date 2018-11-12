@@ -17,13 +17,19 @@ import time
 # You can use the functions in othello_shared to write your AI
 from MinichessLogic import make_move, get_legal_moves
 
+from othello_shared import find_lines, get_possible_moves, get_score, play_move
+
 explored = dict()
 
 
 def compute_utility(board, color):
     score = get_score(board)
+    utility = score[0] - score[1]
 
-    return(utility)
+    if color == 1:
+        return utility
+    elif color == 2:
+        return -1 * utility
 
 ############ ALPHA-BETA PRUNING #####################
 
