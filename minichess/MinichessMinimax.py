@@ -34,8 +34,8 @@ class MinimaxPlayer():
         isEnded = self.getGameEnded(board, player)
         if abs(isEnded) == 1:
             if isEnded == -1:
-                return(float('-inf'))
-            return(float('inf'))
+                return(float(-100000))
+            return(float(100000))
 
         # was a draw
         if isEnded != 0:
@@ -267,16 +267,19 @@ class MinimaxPlayer():
             if (state.tostring(), player) in self.explored:
                 u = self.explored[(state.tostring(), player)]
             else:
+                '''
                 print("----------------------------------------")
                 print("Sending this state to be evaluated by alphabeta_min_node")
                 print(state)
                 print("----------------------------------------")
+                '''
                 u = self.alphabeta_min_node(state, player, float("-inf"), float("inf"), 0, 5)
                 self.explored[(state.tostring(), player)] = u
             if u > minimax_val:
                 minimax_val = u
                 selected_move = move
         print("Selected move: ", selected_move)
+
         index = self.game.action_dict[selected_move]
 
         # reset explored set after each move

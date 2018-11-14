@@ -1,50 +1,22 @@
 import numpy as np
+from MinichessLogic import Board
+from MinichessGame import MinichessGame as Game
 
-dim = (5, 5)
+row1 = '[[ 0,  0,  0,  0,  6],'
+row2 = ' [-4,  0,  0,  0,  0],'
+row3 = ' [ 0,  0, -2,  0,  1],'
+row4 = ' [ 0, -1,  0,  0, -1],'
+row5 = ' [ 0,  0,  0, -5, -6]]'
 
+test = row1 + row2 + row3 + row4 + row5
 
-board = [None] * dim[0]
-for i in range(dim[0]):
-    # board[i] = [0] * dim[0]
-    if (i == 0):
-        # Create all the white pieces here: R, N, B, Q, K
-        board[i] = [4, 2, 3, 5, 6]
-    elif (i == 1):
-        board[i] = [1] * dim[1]
-    elif (i == dim[0] - 2):
-        board[i] = [-1] * dim[1]
-    elif (i == dim[0] - 1):
-        board[i] = [-4, -2, -3, -5, -6]
-        # Create all the white pieces here: R, N, B, Q, K
-    else:
-        board[i] = [0] * dim[1]
+test = np.array(eval(test))
 
-board = np.array(board)
+b = Board()
+b.board = test
 
-print(board.tostring())
-# print(board)
-'''
-print(board)
+# print(b.board)
 
-board = np.flip(board, 0) * -1
-
-print(board)
-
-# deep copy
-new_board = np.copy(board)
-
-promotions = [2, 3, 4, 5, None]
-
-print(promotions)
-
-test_set1 = {'a', 'b'}
-test_set2 = set()
-
-print(test_set2 | test_set1)
-
-elements = {(1, 1, 1), (2, 3, 7), (3, 5, 10)}
-
-print((1, 1, 1) in elements)
-
-print(set([x[1] for x in elements]))
-'''
+g = Game(5, 5)
+print(b.get_legal_moves(1))
+print(g.getGameEnded(b.board, 1))

@@ -2,7 +2,7 @@ import sys
 # Sets the path to the general alpha-zero folder
 sys.path.append('..')
 from Game import Game
-# from .MinichessLogic import Board
+# from MinichessLogic import Board
 from .MinichessLogic import Board
 import numpy as np
 
@@ -236,6 +236,7 @@ class MinichessGame(Game):
         """
         b = Board()
         b.board = np.copy(board)
+        # print(b.board)
         if len(b.get_legal_moves(player)) > 0:
             return(0)
         else:
