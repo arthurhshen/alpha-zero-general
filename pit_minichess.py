@@ -28,7 +28,7 @@ n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
 '''
 
 minimax_p1 = MinimaxPlayer(g, 1).select_move_alphabeta
-minimax_p2 = MinimaxPlayer(g, -1).select_move_alphabeta
+minimax_p2 = MinimaxPlayer(g, 1).select_move_alphabeta
 
 
 #n2 = NNet(g)

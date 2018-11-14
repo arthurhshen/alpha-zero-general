@@ -73,7 +73,11 @@ class Board():
             print("Player: ", player)
             print(self.board)
             print(move)
-            time.sleep(100)
+
+            print(np.flip(self.board, 0) * -1)
+            # time.sleep(100)
+
+        assert(piece * player > 0)
 
         # If the piece is a pawn, we may have to deal with underpromotions
         if abs(piece) == 1:
@@ -113,6 +117,9 @@ class Board():
         for r in range(rows):
             for c in range(cols):
                 piece = self.board[r][c]
+                # print("In get_legal_moves")
+                # print("piece ", piece)
+                # print("Player ", player)
                 if player * piece > 0:
                     moves = moves | self._get_moves_for_piece(r, c, player, check_checks)
 
@@ -173,7 +180,10 @@ class Board():
         return(True)
 
     def _is_check(self, curr_board, player, check_checks=True):
-        # Returns true if 'player' is in check
+        # Returns true if 'player' is in attacked/ in check - this will also return true if the board
+        # passed in has the opponenet's king attacking it since we will use this function to ensure that
+        # the position is legal
+
         # Find all squares that the opposite color controls. Also find the
         # square with the 'player' king. If the square with 'player' king
         # is in the set of squares that the opposite color controls, return
@@ -185,6 +195,8 @@ class Board():
 
         rows, cols = self.dim
         king_loc = None
+
+        '''
         controlled_squares = set(x[1] for x in temp_b.get_legal_moves(-player, check_checks))
 
         # find king's location
@@ -197,6 +209,18 @@ class Board():
             return(True)
 
         return(False)
+
+        '''
+
+        # find king's location
+        for r in range(rows):
+            for c in range(cols):
+                if temp_b.board[r][c] * player == 6:
+                    king_loc = (r, c)
+
+        king_row = king_loc[0]
+        king_col = king_loc[1]
+
 
     def _get_moves_for_pawn(self, row, col, player, check_checks=True):
         rows, cols = self.dim
@@ -425,6 +449,10 @@ class Board():
             (row + 0, col + 1),
             (row + 0, col - 1)
         ]
+
+        # print("King moves")
+        # print("King: ", self.board[row][col])
+        # print("Player: ", player)
 
         for new_r, new_c in new_indices:
             if self._check_square(row, col, new_r, new_c, player, check_checks):

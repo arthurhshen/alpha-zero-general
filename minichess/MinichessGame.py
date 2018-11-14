@@ -155,6 +155,7 @@ class MinichessGame(Game):
 
         b = Board()
 
+        # Flip the board if player is -1 and keep it the same if player = 1
         b.board = self.getCanonicalForm(board, player)
 
         # in MCTS.py - the action passed in is an integer representing the index of a valid move
@@ -272,6 +273,35 @@ class MinichessGame(Game):
                 new_board[r][c] = num_to_piece_dict[board[r][c]]
 
         print(np.array(new_board))
+
+
+def display(board):
+    num_to_piece_dict = {0: "  ",
+                         1: "wp",
+                         -1: "bp",
+                         2: "wN",
+                         -2: "bN",
+                         3: "wB",
+                         -3: "bB",
+                         4: "wR",
+                         -4: "bR",
+                         5: "wQ",
+                         -5: "bQ",
+                         6: "wK",
+                         -6: "bK"}
+
+    rows, cols = board.shape
+
+    new_board = []
+
+    for r in range(rows):
+        new_board.append([""] * cols)
+
+    for r in range(rows):
+        for c in range(cols):
+            new_board[r][c] = num_to_piece_dict[board[r][c]]
+
+    print(np.array(new_board))
 
 
 '''

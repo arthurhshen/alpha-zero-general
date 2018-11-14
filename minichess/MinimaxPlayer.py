@@ -3,6 +3,14 @@ explored = set()
 from MinichessLogic import Board
 
 
+class MinimaxPlayer():
+    def __init__(self, game):
+        self.game = game
+
+    def play(self, board):
+        pass
+
+
 def alphabeta_min_node(board, color, alpha, beta, level, limit):
     global explored
 
@@ -20,7 +28,7 @@ def alphabeta_min_node(board, color, alpha, beta, level, limit):
     if (board, opponent) in explored:
         return explored[(board, opponent)]
 
-    moves = get_possible_moves(board, opponent)
+    moves = list(get_possible_moves(board, opponent))
 
     if len(moves) == 0:
         ans = compute_utility(board, color)
