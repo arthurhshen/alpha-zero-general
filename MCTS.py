@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import minichess.MinichessGame import display
+from minichess.MinichessGame import display
 import copy
 
 EPS = 1e-8
