@@ -201,7 +201,7 @@ class MinichessGame(Game):
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        return()
+        return [(board, pi), (board[:, ::-1], pi[::-1])]
 
     def getValidMoves(self, board, player):
         """
