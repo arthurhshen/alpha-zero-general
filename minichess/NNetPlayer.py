@@ -10,9 +10,7 @@ class NNetPlayer():
     def __init__(self, game, ckpt_path, ckpt_file, args):
         self.nnet = NNet(game)
         self.args = dotdict(args)
-
         self.nnet.load_checkpoint(ckpt_path, ckpt_file)
-
         self.mcts = MCTS(game, self.nnet, self.args)
 
     def play(self, board):
