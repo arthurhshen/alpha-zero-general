@@ -160,9 +160,12 @@ class BoardGuiTk(tk.Frame):
                     if(filename not in self.icons): 
                         im = Image.open(filename)
                         self.icons[filename] = ImageTk.PhotoImage(im, width=32, height=32)
-                    print(filename)
-                    self.addpiece(piecename, self.icons[filename], x, y)
-                    self.placepiece(piecename, x, y)
+                        img = tk.Label(self, image=self.icons[filename])
+                        img.image = self.icons[filename]
+                        img.place(x=0, y=0)
+
+                    #self.addpiece(piecename, self.icons[filename], x, y)
+                    #self.placepiece(piecename, x, y)
 
 
     def reset(self):
@@ -179,8 +182,6 @@ def display(chessboard):
     gui = BoardGuiTk(root, chessboard)
     gui.pack(side="top", fill="both", expand="true", padx=4, pady=4)
     gui.draw_pieces()
-    print(gui.icons)
-    gui.refresh()
 
     root.resizable(0,0)
     root.mainloop()

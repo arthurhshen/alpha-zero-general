@@ -246,32 +246,45 @@ class MinichessGame(Game):
                 return(0.0001)
 
     def display(self, board):
-        num_to_piece_dict = {0: "  ",
-                             1: "wp",
-                             -1: "bp",
-                             2: "wN",
-                             -2: "bN",
-                             3: "wB",
-                             -3: "bB",
-                             4: "wR",
-                             -4: "bR",
-                             5: "wQ",
-                             -5: "bQ",
-                             6: "wK",
-                             -6: "bK"}
+        UNICODE_PIECES = {
+          4: u'♜', 2: u'♞', 3: u'♝', 5: u'♛',
+          6: u'♚', 1: u'♟', -4: u'♖', -2: u'♘',
+          -3: u'♗', -5: u'♕', -6: u'♔', -1: u'♙',
+          None: ' '
+        }
 
         rows, cols = self.dim
 
         new_board = []
 
-        for r in range(rows):
-            new_board.append([""] * cols)
+        print('   ——   ——   ——   ——   —— ')
+        for x in range(rows):
+            for y in range(cols):
+                p = board[x][y]
+                if p != 0:
+                    print (' | ' + UNICODE_PIECES[p] + ' ', end='')
+                else: print (' |   ', end='')
+            print(' |\n   ——   ——   ——   ——   —— ')
 
-        for r in range(rows):
-            for c in range(cols):
-                new_board[r][c] = num_to_piece_dict[board[r][c]]
+def display(board):
+    UNICODE_PIECES = {
+      4: u'♜', 2: u'♞', 3: u'♝', 5: u'♛',
+      6: u'♚', 1: u'♟', -4: u'♖', -2: u'♘',
+      -3: u'♗', -5: u'♕', -6: u'♔', -1: u'♙',
+      None: ' '
+    }
 
-        print(np.array(new_board))
+
+    print('   ——   ——   ——   ——   —— ')
+    for x in range(board.dim[0]):
+        for y in range(board.dim[1]):
+            p = board.board[x][y]
+            if p != 0:
+                print (' | ' + UNICODE_PIECES[p] + ' ', end='')
+            else: print (' |   ', end='')
+        print(' |\n   ——   ——   ——   ——   —— ')
+
+    pass
 
 
 '''
