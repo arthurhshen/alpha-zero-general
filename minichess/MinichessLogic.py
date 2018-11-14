@@ -221,6 +221,213 @@ class Board():
         king_row = king_loc[0]
         king_col = king_loc[1]
 
+        # Check knight squares
+        knight_indices = [
+            (king_row + 2, king_col + 1),
+            (king_row + 2, king_col - 1),
+            (king_row - 2, king_col + 1),
+            (king_row - 2, king_col - 1),
+            (king_row + 1, king_col + 2),
+            (king_row + 1, king_col - 2),
+            (king_row - 1, king_col + 2),
+            (king_row - 1, king_col - 2)
+        ]
+
+        for r, c in knight_indices:
+            if r < 0 or c < 0 or r > rows - 1 or c > cols - 1:
+                continue
+            square = curr_board[r][c] * player
+            # If the square contains a knight of the opposite color
+            if square == -2:
+                return(True)
+
+        # Check for pawns:
+        pawn_indices = [
+            (king_row + player, king_col + 1),
+            (king_row + player, king_col - 1)
+        ]
+
+        for r, c in pawn_indices:
+            if r < 0 or c < 0 or r > rows - 1 or c > cols - 1:
+                continue
+            square = curr_board[r][c] * player
+            # If the square contains a pawn, queen, bishop, or king of the opposite color
+            if square == -1 or square == -3 or square == -5 or square == -6:
+                return(True)
+
+        # Check for king:
+        king_indices = [
+            (king_row + 1, king_col + 1),
+            (king_row + 1, king_col - 1),
+            (king_row + 1, king_col + 0),
+            (king_row - 1, king_col + 1),
+            (king_row - 1, king_col - 1),
+            (king_row - 1, king_col + 0),
+            (king_row + 0, king_col + 1),
+            (king_row + 0, king_col - 1)
+        ]
+
+        for r, c in king_indices:
+            if r < 0 or c < 0 or r > rows - 1 or c > cols - 1:
+                continue
+            square = curr_board[r][c] * player
+            if square == -6:
+                return(True)
+
+        # Check bishops/queens
+        up_right = True
+        up_left = True
+        down_right = True
+        down_left = True
+
+        for offset in range(1, min(rows, cols)):
+            # Up and right diagonal
+            if up_right:
+                new_r = king_row + offset
+                new_c = king_col + offset
+
+                # We've reached the end of the board
+                square = self._get_piece_on_square(curr_board, new_r, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    up_right = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -3 or square * player == -5:
+                    return(True)
+
+            # Up and left diagonal
+            if up_left:
+                new_r = king_row + offset
+                new_c = king_col - offset
+
+                # We've reached the end of the board
+                square = self._get_piece_on_square(curr_board, new_r, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    up_left = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -3 or square * player == -5:
+                    return(True)
+
+            if down_right:
+                new_r = king_row - offset
+                new_c = king_col + offset
+                # We've reached the end of the board
+                square = self._get_piece_on_square(curr_board, new_r, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    down_right = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -3 or square * player == -5:
+                    return(True)
+
+            if down_left:
+                new_r = king_row - offset
+                new_c = king_col - offset
+
+                # We've reached the end of the board
+                square = self._get_piece_on_square(curr_board, new_r, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    down_left = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -3 or square * player == -5:
+                    return(True)
+
+        # Check Rooks/Queen moves
+        up = True
+        down = True
+        left = True
+        right = True
+
+        for offset in range(1, max(rows, cols)):
+            if up:
+                new_r = king_row + offset
+                # We've reached the end of the board
+                square = self._get_piece_on_square(curr_board, new_r, king_col)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    up = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -4 or square * player == -5:
+                    return(True)
+
+            if down:
+                new_r = king_row - offset
+
+                square = self._get_piece_on_square(curr_board, new_r, king_col)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    down = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -4 or square * player == -5:
+                    return(True)
+
+            if left:
+                new_c = king_col - offset
+                square = self._get_piece_on_square(curr_board, king_row, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    left = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -4 or square * player == -5:
+                    return(True)
+
+            if right:
+                new_c = king_col + offset
+                square = self._get_piece_on_square(curr_board, king_row, new_c)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player > 0:
+                    right = False
+
+                # If the piece is a bishop or a queen of the opposite color, the position is
+                # check
+                if square * player == -4 or square * player == -5:
+                    return(True)
+
+        return(False)
+
+    def _get_piece_on_square(self, curr_board, row, col):
+        # Returns 100 if the row and col are invalid; otherwise returns the
+        # contents of the square (either 0 for empty or an integer for a piece)
+
+        rows, cols = self.dim
+
+        if row < 0 or col < 0 or row > rows - 1 or col > cols - 1:
+            return(100)
+
+        square = curr_board[row][col]
+        return(square)
 
     def _get_moves_for_pawn(self, row, col, player, check_checks=True):
         rows, cols = self.dim

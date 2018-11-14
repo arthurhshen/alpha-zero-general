@@ -19,14 +19,13 @@ import numpy as np
 from .MinichessLogic import Board
 # from MinichessLogic import make_move, get_legal_moves
 
-explored = dict()
-
 
 class MinimaxPlayer():
 
     def __init__(self, game, player):
         self.game = game
         self.player = player
+        self.explored = dict()
 
     def compute_utility(self, board, player):
         # print("compute_utility")
@@ -143,8 +142,6 @@ class MinimaxPlayer():
     ############ ALPHA-BETA PRUNING #####################
 
     def alphabeta_min_node(self, board, player, alpha, beta, level, limit):
-        global explored
-
         if player == 1:
             opponent = -1
         elif player == -1:
@@ -156,8 +153,8 @@ class MinimaxPlayer():
         else:
             level = level + 1
 
-        if (board.tostring(), opponent) in explored:
-            return explored[(board.tostring(), opponent)]
+        if (board.tostring(), opponent) in self.explored:
+            return self.explored[(board.tostring(), opponent)]
 
         b = Board()
         b.board = np.copy(board)
@@ -183,8 +180,8 @@ class MinimaxPlayer():
         for move in moves:
             state = b.make_move(move, opponent)
             # state = self.game.getNextState(board, opponent, move)[0]
-            if (state.tostring(), opponent) in explored:
-                val = explored[(state.tostring(), opponent)]
+            if (state.tostring(), opponent) in self.explored:
+                val = self.explored[(state.tostring(), opponent)]
             else:
                 '''
                 print("----------------------------------------")
@@ -194,7 +191,7 @@ class MinimaxPlayer():
                 print("----------------------------------------")
                 '''
                 val = self.alphabeta_max_node(state, player, alpha, beta, level, limit)
-                explored[(state.tostring(), opponent)] = val
+                self.explored[(state.tostring(), opponent)] = val
 
             v = min(v, val)
             if v <= alpha:
@@ -205,15 +202,13 @@ class MinimaxPlayer():
         return v
 
     def alphabeta_max_node(self, board, player, alpha, beta, level, limit):
-        global explored
-
         if level >= limit:
             return self.compute_utility(board, player)
         else:
             level = level + 1
 
-        if (board.tostring(), player) in explored:
-            return explored[(board.tostring(), player)]
+        if (board.tostring(), player) in self.explored:
+            return self.explored[(board.tostring(), player)]
 
         b = Board()
         b.board = np.copy(board)
@@ -231,11 +226,11 @@ class MinimaxPlayer():
             # state = b.make_move(move, player)
             # state = self.game.getNextState(board, player, move)[0]
             state = b.make_move(move, player)
-            if (state.tostring(), player) in explored:
-                val = explored[(state.tostring(), player)]
+            if (state.tostring(), player) in self.explored:
+                val = self.explored[(state.tostring(), player)]
             else:
                 val = self.alphabeta_min_node(state, player, alpha, beta, level, limit)
-                explored[(state.tostring(), player)] = val
+                self.explored[(state.tostring(), player)] = val
 
             v = max(v, val)
 
@@ -246,7 +241,6 @@ class MinimaxPlayer():
         return v
 
     def select_move_alphabeta(self, board):
-        global explored
 
         # For our program, the alpha-beta player will always be 1
         player = self.player
@@ -270,18 +264,23 @@ class MinimaxPlayer():
             # state = b.make_move(move, player)
             # state = self.game.getNextState(board, player, move)[0]
             state = b.make_move(move, player)
-            if (state.tostring(), player) in explored:
-                u = explored[(state.tostring(), player)]
+            if (state.tostring(), player) in self.explored:
+                u = self.explored[(state.tostring(), player)]
             else:
                 print("----------------------------------------")
                 print("Sending this state to be evaluated by alphabeta_min_node")
                 print(state)
                 print("----------------------------------------")
                 u = self.alphabeta_min_node(state, player, float("-inf"), float("inf"), 0, 5)
-                explored[(state.tostring(), player)] = u
+                self.explored[(state.tostring(), player)] = u
             if u > minimax_val:
                 minimax_val = u
                 selected_move = move
         print("Selected move: ", selected_move)
         index = self.game.action_dict[selected_move]
+
+        # reset explored set after each move
+        print(len(self.explored))
+        self.explored = dict()
+
         return(index)
