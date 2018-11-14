@@ -75,7 +75,7 @@ class BoardGuiTk(tk.Frame):
         col_size = row_size = event.widget.master.square_size
 
         current_column = event.x / col_size
-        current_row = 7 - (event.y / row_size)
+        current_row = 4 - (event.y / row_size)
 
         position = self.chessboard.letter_notation((current_row, current_column))
         piece = self.chessboard[position]
@@ -112,7 +112,7 @@ class BoardGuiTk(tk.Frame):
         '''Place a piece at the given row/column'''
         self.pieces[name] = (row, column)
         x0 = (column * self.square_size) + int(self.square_size/2)
-        y0 = ((7-row) * self.square_size) + int(self.square_size/2)
+        y0 = ((4-row) * self.square_size) + int(self.square_size/2)
         self.canvas.coords(name, x0, y0)
 
     def refresh(self, event={}):
@@ -124,11 +124,12 @@ class BoardGuiTk(tk.Frame):
 
         self.canvas.delete("square")
         color = self.color2
+
         for row in range(self.rows):
-            color = self.color1 if color == self.color2 else self.color2
+            #color = self.color1 if color == self.color2 else self.color2
             for col in range(self.columns):
                 x1 = (col * self.square_size)
-                y1 = ((7-row) * self.square_size)
+                y1 = ((4-row) * self.square_size)
                 x2 = x1 + self.square_size
                 y2 = y1 + self.square_size
                 if (self.selected is not None) and (row, col) == self.selected:
@@ -156,9 +157,10 @@ class BoardGuiTk(tk.Frame):
                         filename = ("img/black%s.png" % (abbrev[p]))
                         piecename = ("%s%s%s" % (abbrev[p], x, y))
 
-                    if(filename not in self.icons):
-                        self.icons[filename] = ImageTk.PhotoImage(file=filename, width=32, height=32)
-                        
+                    if(filename not in self.icons): 
+                        im = Image.open(filename)
+                        self.icons[filename] = ImageTk.PhotoImage(im, width=32, height=32)
+                    print(filename)
                     self.addpiece(piecename, self.icons[filename], x, y)
                     self.placepiece(piecename, x, y)
 
@@ -177,6 +179,8 @@ def display(chessboard):
     gui = BoardGuiTk(root, chessboard)
     gui.pack(side="top", fill="both", expand="true", padx=4, pady=4)
     gui.draw_pieces()
+    print(gui.icons)
+    gui.refresh()
 
     root.resizable(0,0)
     root.mainloop()
