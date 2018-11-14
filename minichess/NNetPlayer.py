@@ -1,7 +1,7 @@
-from minichess.MiniChessGame import display
-from minichess.MiniChessLogic import Board
-from minichess.MiniChessUtil import *
-from minichess.MiniChessConstants import *
+from minichess.MinichessGame import display
+from minichess.MinichessLogic import Board
+# from minichess.MiniChessUtil import *
+# from minichess.MiniChessConstants import *
 from minichess.keras.NNet import NNetWrapper as NNet
 from MCTS import MCTS
 from utils import *
