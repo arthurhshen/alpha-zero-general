@@ -11,20 +11,20 @@ from utils import *
 from NeuralNet import NeuralNet
 
 import argparse
-from OthelloNNet import OthelloNNet as onnet
+from .MinichessNNet import MiniChessNNet as minichessnnet
 
 args = dotdict({
-    'lr': 0.001,
+    'lr': 0.005,
     'dropout': 0.3,
-    'epochs': 10,
+    'epochs': 100,
     'batch_size': 64,
-    'cuda': False,
+    'cuda': True,
     'num_channels': 512,
 })
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
-        self.nnet = onnet(game, args)
+        self.nnet = minichessnnet(game, args)
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
 
