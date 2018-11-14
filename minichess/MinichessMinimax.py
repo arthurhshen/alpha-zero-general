@@ -67,7 +67,7 @@ class MinimaxPlayer():
         else:
             move_ratio = player_moves / opponent_moves - 1
 
-        score = mat_ratio * 5 + move_ratio
+        score = mat_ratio * 2 + move_ratio
 
         return(score)
 
