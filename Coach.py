@@ -90,15 +90,26 @@ class Coach():
             # examples of the iteration
             if not self.skipFirstSelfPlay or i>1:
                 iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
-    
+
                 eps_time = AverageMeter()
                 bar = Bar('Self Play', max=self.args.numEps)
                 end = time.time()
-    
+
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
-    
+
+                    # Drop 80% of draws
+                    examples = self.executeEpisode()
+                    to_add = False
+                    loss_rate = self.args.filter_draw_rate
+                    if abs(example[0][2]) != 1:
+                        if random.random() >= loss_rate:
+                            to_add = True
+                    else:
+                        to_add = True
+                    if to_add:
+                        iterationTrainExamples += examples
+
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
                     end = time.time()
@@ -107,16 +118,16 @@ class Coach():
                     bar.next()
                 bar.finish()
 
-                # save the iteration examples to the history 
+                # save the iteration examples to the history
                 self.trainExamplesHistory.append(iterationTrainExamples)
-                
+
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 print("len(trainExamplesHistory) =", len(self.trainExamplesHistory), " => remove the oldest trainExamples")
                 self.trainExamplesHistory.pop(0)
             # backup history to a file
-            # NB! the examples were collected using the model from the previous iteration, so (i-1)  
+            # NB! the examples were collected using the model from the previous iteration, so (i-1)
             self.saveTrainExamples(i-1)
-            
+
             # shuffle examlpes before training
             trainExamples = []
             for e in self.trainExamplesHistory:
@@ -127,7 +138,7 @@ class Coach():
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pmcts = MCTS(self.game, self.pnet, self.args)
-            
+
             self.nnet.train(trainExamples)
             nmcts = MCTS(self.game, self.nnet, self.args)
 
@@ -143,7 +154,7 @@ class Coach():
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
-                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')                
+                self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'
