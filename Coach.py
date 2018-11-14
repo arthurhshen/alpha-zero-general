@@ -8,6 +8,7 @@ import os
 import sys
 from pickle import Pickler, Unpickler
 from random import shuffle
+import random
 
 
 class Coach():
@@ -32,10 +33,8 @@ class Coach():
         trainExamples. The game is played till the game ends. After the game
         ends, the outcome of the game is used to assign values to each example
         in trainExamples.
-
         It uses a temp=1 if episodeStep < tempThreshold, and thereafter
         uses temp=0.
-
         Returns:
             trainExamples: a list of examples of the form (canonicalBoard,pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
@@ -75,6 +74,7 @@ class Coach():
             r = self.game.getGameEnded(board, self.curPlayer)
 
             if r != 0:
+                print(r)
                 return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
     def learn(self):
@@ -99,7 +99,18 @@ class Coach():
 
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
+
+                    # Drop 80% of draws
+                    examples = self.executeEpisode()
+                    to_add = False
+                    loss_rate = self.args.filter_draw_rate
+                    if abs(examples[0][2]) != 1:
+                        if random.random() >= loss_rate:
+                            to_add = True
+                    else:
+                        to_add = True
+                    if to_add:
+                        iterationTrainExamples += examples
 
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
