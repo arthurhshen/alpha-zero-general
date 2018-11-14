@@ -11,7 +11,7 @@ from utils import *
 from NeuralNet import NeuralNet
 
 import argparse
-from .MiniChessNNet import MiniChessNNet as minichessnnet
+from .MinichessNNet import MiniChessNNet as minichessnnet
 
 args = dotdict({
     'lr': 0.005,

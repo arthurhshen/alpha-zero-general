@@ -1,5 +1,8 @@
 import math
 import numpy as np
+import minichess.MinichessGame import display
+import copy
+
 EPS = 1e-8
 
 class MCTS():
@@ -29,7 +32,9 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
+            tmp_game = copy.deepcopy(self.game)
             self.search(canonicalBoard)
+            self.game = tmp_game
 
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
@@ -67,11 +72,15 @@ class MCTS():
 
         s = self.game.stringRepresentation(canonicalBoard)
 
-        if s not in self.Es:
-            self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
-        if self.Es[s]!=0:
-            # terminal node
-            return -self.Es[s]
+        game_end_score = self.game.getGameEnded(canonicalBoard, 1)
+        if game_end_score !=0:
+            return -game_end_score
+
+        # if s not in self.Es:
+        #     self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
+        # if self.Es[s]!=0:
+        #     # terminal node
+        #     return -self.Es[s]
 
         if s not in self.Ps:
             # leaf node
@@ -83,9 +92,9 @@ class MCTS():
                 self.Ps[s] /= sum_Ps_s    # renormalize
             else:
                 # if all valid moves were masked make all valid moves equally probable
-                
+
                 # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
-                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
+                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.
                 print("All valid moves were masked, do workaround.")
                 self.Ps[s] = self.Ps[s] + valids
                 self.Ps[s] /= np.sum(self.Ps[s])
