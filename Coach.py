@@ -65,16 +65,22 @@ class Coach():
             # orig
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
 
-            #board, _ = self.game.getNextState(canonicalBoard, 1, action)
-            #self.curPlayer = -self.curPlayer
-
-            # print("new board:")
-            # print(self.game.display(board))
-
             r = self.game.getGameEnded(board, self.curPlayer)
 
             if r != 0:
-                print(r)
+                print("\n========NEW MOVE=========")
+                print("player: ", self.curPlayer)
+                print("current board:")
+                print(self.game.display(board))
+                action = np.random.choice(len(pi), p=pi)
+                print("action: ")
+                print(self.game.index_dict[action])
+                if r == 1:
+                    print ("Player -1 Won")
+                if r == -1:
+                    print ("Player 1 Won")
+                else:
+                    print ("Stalemate")
                 return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
     def learn(self):
@@ -104,7 +110,7 @@ class Coach():
                     examples = self.executeEpisode()
                     to_add = False
                     loss_rate = self.args.filter_draw_rate
-                    # print(examples)
+
                     if abs(examples[0][2]) != 1:
                         if random.random() >= loss_rate:
                             to_add = True
