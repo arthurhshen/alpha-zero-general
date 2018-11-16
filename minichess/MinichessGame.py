@@ -165,8 +165,6 @@ class MinichessGame(Game):
 
         new_board = b.make_move(action, 1)
         # MCTS uses getCanonicalForm - always looks at the board from white's perspective - hard code 1
-        # new_board = b.make_move(action, 1)
-        # print(new_board)
 
         # need to flip again to ensure that the board returned does not cause double turns for one player
         new_board = self.getCanonicalForm(new_board, player)
@@ -192,7 +190,7 @@ class MinichessGame(Game):
             return(board)
 
         # flips the board so the coordinates are correct (for promotion) and multiplies by -1
-        board = np.flip(board, 0) * -1
+        board = np.flip(board,0) * -1
         return(board)
 
     def stringRepresentation(self, board):
@@ -238,15 +236,18 @@ class MinichessGame(Game):
         b = Board()
         b.board = np.copy(board)
         # print(b.board)
-        if len(b.get_legal_moves(player)) > 0:
-            return(0)
+        if len(b.get_legal_moves(player)) > 0 :
+            return 0
         else:
-            # is checkmate
+            # current player is checkmate
             if (b._is_check(board, player)):
                 return(-1)
+            # other player is checkmate
+            if (b._is_check(board, -player)):
+                return(1)
             # stalemate
             else:
-                return(0.0001)
+                return 1e-2
 
     def display(self, board):
         UNICODE_PIECES = {
@@ -282,58 +283,3 @@ def display(board):
             else:
                 print (' |   ', end='')
         print(' |\n   ——   ——   ——   ——   —— ')
-
-
-'''
-
-test = MinichessGame(5, 5)
-
-valids = test.getValidMoves(test.getInitBoard(), 1)
-
-count = 0
-moves = set()
-for v in valids:
-    if v == 0:
-        count += 1
-        continue
-    else:
-        moves.add(test.index_dict[count])
-        count += 1
-
-for m in moves:
-    print(m)
-
-test_board = np.array([[], [], [], [], []])
-
-print(test.getInitBoard())
-
-'''
-'''
-test = MinichessGame(5, 5)
-# print(test.action_size)
-
-board, player = test.getNextState(test.getInitBoard(), 1, ((1, 2), (2, 2)))
-print(board)
-board2, player = test.getNextState(board, -1, ((3, 1), (2, 2)))
-print(board2)
-board2, _ = test.getNextState(board2, -1, ((2, 2), (1, 1)))
-print(board2)
-board2, _ = test.getNextState(board2, -1, ((1, 1), (0, 0, -2)))
-print(board2)
-
-canonical = test.getCanonicalForm(board2, -1)
-print(canonical)
-
-
-max_index = 0
-
-for key in test.action_dict:
-    val = test.action_dict[key]
-    if val > max_index:
-        max_index = val
-
-    # if key[0] == (0, 1):
-    #    print("Val: {}\tGoes to: {}".format(val, key[1]))
-
-# print("max index: {}".format(max_index))
-'''
