@@ -237,7 +237,6 @@ class MinichessGame(Game):
         """
         b = Board()
         b.board = np.copy(board)
-        # print(b.board)
         if len(b.get_legal_moves(player)) > 0 :
             return 0
         else:

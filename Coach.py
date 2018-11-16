@@ -77,8 +77,10 @@ class Coach():
                 print(self.game.index_dict[action])
                 if r == 1:
                     print ("Player -1 Won")
-                else:
+                if r == -1:
                     print ("Player 1 Won")
+                else:
+                    print ("Stalemate")
                 return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
     def learn(self):
