@@ -17,10 +17,6 @@ g = MinichessGame(5, 5)
 # minimax player
 minimax_p1 = MinimaxPlayer(g, 1).select_move_alphabeta
 
-# For now testing by playing the 2 minimax players against each other
-# p2 = MinimaxPlayer(g, 1).select_move_alphabeta
-
-
 # nnet players
 n1 = NNet(g)
 n1.load_checkpoint('./temp/','temp.pth.tar')
@@ -31,5 +27,5 @@ n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
 
 # arena = Arena.Arena(n1p, minimax_p1, g, display=display)
 
-arena = Arena.Arena(n1, minimax_p1, g, display=display)
+arena = Arena.Arena(n1p, minimax_p1, g, display=display)
 print(arena.playGames(10, verbose=True))

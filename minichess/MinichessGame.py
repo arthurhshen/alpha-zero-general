@@ -165,7 +165,7 @@ class MinichessGame(Game):
         b.board = self.getCanonicalForm(board, player)
 
         # in MCTS.py - the action passed in is an integer representing the index of a valid move
-        if (isinstance(action, int)):
+        if (isinstance(action, int) or isinstance(action, np.int64)):
             action = self.index_dict[action]
 
         new_board = b.make_move(action, 1)

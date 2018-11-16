@@ -248,12 +248,11 @@ class MinimaxPlayer():
         b = Board()
         b.board = np.copy(board)
 
-        print("in select_move_alphabeta")
-        print(b.board)
+        # print("in select_move_alphabeta")
+        # print(b.board)
 
         selected_move = -1
         moves = list(b.get_legal_moves(player))
-        print(moves)
         minimax_val = float("-inf")
 
         # sort moves based on associated utility value for result board
