@@ -12,7 +12,7 @@ args = dotdict({
     'numMCTSSims': 40,
     'arenaCompare': 20,
     'cpuct': 1,
-    'filter_draw_rate': 0.8,
+    'filter_draw_rate': 0.5,
 
     'checkpoint': './temp/',
     'load_model': False,
