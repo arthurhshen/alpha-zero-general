@@ -221,6 +221,8 @@ class Board():
         king_row = king_loc[0]
         king_col = king_loc[1]
 
+        # print("King location: ", king_loc)
+
         # Check knight squares
         knight_indices = [
             (king_row + 2, king_col + 1),
@@ -289,16 +291,15 @@ class Board():
                 # We've reached the end of the board
                 square = self._get_piece_on_square(curr_board, new_r, new_c)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    up_right = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -3 or square * player == -5:
                     return(True)
 
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    up_right = False
             # Up and left diagonal
             if up_left:
                 new_r = king_row + offset
@@ -307,15 +308,14 @@ class Board():
                 # We've reached the end of the board
                 square = self._get_piece_on_square(curr_board, new_r, new_c)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    up_left = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -3 or square * player == -5:
                     return(True)
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    up_left = False
 
             if down_right:
                 new_r = king_row - offset
@@ -325,13 +325,14 @@ class Board():
 
                 # 100 is our code for an invalid square
                 # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    down_right = False
 
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -3 or square * player == -5:
                     return(True)
+
+                if square == 100 or square * player != 0:
+                    down_right = False
 
             if down_left:
                 new_r = king_row - offset
@@ -340,16 +341,15 @@ class Board():
                 # We've reached the end of the board
                 square = self._get_piece_on_square(curr_board, new_r, new_c)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    down_left = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -3 or square * player == -5:
                     return(True)
 
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    down_left = False
         # Check Rooks/Queen moves
         up = True
         down = True
@@ -362,58 +362,55 @@ class Board():
                 # We've reached the end of the board
                 square = self._get_piece_on_square(curr_board, new_r, king_col)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    up = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -4 or square * player == -5:
                     return(True)
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    up = False
 
             if down:
                 new_r = king_row - offset
 
                 square = self._get_piece_on_square(curr_board, new_r, king_col)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    down = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -4 or square * player == -5:
                     return(True)
+
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    down = False
 
             if left:
                 new_c = king_col - offset
                 square = self._get_piece_on_square(curr_board, king_row, new_c)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    left = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -4 or square * player == -5:
                     return(True)
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    left = False
 
             if right:
                 new_c = king_col + offset
                 square = self._get_piece_on_square(curr_board, king_row, new_c)
 
-                # 100 is our code for an invalid square
-                # If the piece is of the same color, the position cannot be check
-                if square == 100 or square * player > 0:
-                    right = False
-
                 # If the piece is a bishop or a queen of the opposite color, the position is
                 # check
                 if square * player == -4 or square * player == -5:
                     return(True)
+                # 100 is our code for an invalid square
+                # If the piece is of the same color, the position cannot be check
+                if square == 100 or square * player != 0:
+                    right = False
 
         return(False)
 
