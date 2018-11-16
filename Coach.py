@@ -104,7 +104,7 @@ class Coach():
                     examples = self.executeEpisode()
                     to_add = False
                     loss_rate = self.args.filter_draw_rate
-                    print(examples)
+                    # print(examples)
                     if abs(examples[0][2]) != 1:
                         if random.random() >= loss_rate:
                             to_add = True

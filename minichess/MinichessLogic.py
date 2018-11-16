@@ -664,6 +664,54 @@ class Board():
 
         return(moves)
 
+    def insufficient_material(self):
+        rows, cols = self.dim
+
+        white_knight_count = 0
+        white_bishop_count = 0
+
+        black_knight_count = 0
+        black_bishop_count = 0
+
+        for r in range(rows):
+            for c in range(cols):
+                piece = self.board[r][c]
+
+                # empty square
+                if piece == 0:
+                    continue
+                piece_type = abs(piece)
+
+                if piece_type in (1, 4, 5):
+                    return(False)
+
+                # Ignore kings
+                if piece_type == 6:
+                    continue
+
+                # Black knight
+                if piece == -2:
+                    black_knight_count += 1
+                    if black_knight_count > 1 or black_bishop_count > 0:
+                        return(False)
+                # White knight
+                if piece == 2:
+                    white_knight_count += 1
+                    if white_knight_count > 1 or white_bishop_count > 0:
+                        return(False)
+                # Black bishop
+                if piece == -3:
+                    black_bishop_count += 1
+                    if black_knight_count > 0:
+                        return(False)
+                # White bishop
+                if piece == 3:
+                    white_bishop_count += 1
+                    if white_knight_count > 0:
+                        return(False)
+
+        return(True)
+
 
 # testBoard = Board((5, 5))
 # print(testBoard.board)

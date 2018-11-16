@@ -11,6 +11,8 @@ except ImportError:
 import numpy as np
 
 
+# To make this more efficient - in getGameEnded, just find 1 legal move instead of them all
+
 class MinichessGame(Game):
     def __init__(self, r, c):
         self.dim = (r, c)
@@ -193,7 +195,7 @@ class MinichessGame(Game):
             return(board)
 
         # flips the board so the coordinates are correct (for promotion) and multiplies by -1
-        board = np.flip(board,0) * -1
+        board = np.flip(board, 0) * -1
         return(board)
 
     def stringRepresentation(self, board):
@@ -239,7 +241,11 @@ class MinichessGame(Game):
         b = Board()
         b.board = np.copy(board)
         # print(b.board)
-        if len(b.get_legal_moves(player)) > 0 :
+
+        if len(b.get_legal_moves(player)) > 0:
+            # See if there is insufficient mating material
+            if b.insufficient_material():
+                return 1e-8
             return 0
         else:
             # current player is checkmate
@@ -250,7 +256,7 @@ class MinichessGame(Game):
                 return(1)
             # stalemate
             else:
-                return 1e-2
+                return 1e-8
 
     def display(self, board):
         UNICODE_PIECES = {

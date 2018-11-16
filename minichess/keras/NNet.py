@@ -11,7 +11,7 @@ from utils import *
 from NeuralNet import NeuralNet
 
 import argparse
-from .MiniChessNNet import MiniChessNNet as minichessnnet
+from .MinichessNNet import MiniChessNNet as minichessnnet
 
 args = dotdict({
     'lr': 0.005,
@@ -21,6 +21,7 @@ args = dotdict({
     'cuda': True,
     'num_channels': 512,
 })
+
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
@@ -36,7 +37,7 @@ class NNetWrapper(NeuralNet):
         input_boards = np.asarray(input_boards)
         target_pis = np.asarray(target_pis)
         target_vs = np.asarray(target_vs)
-        self.nnet.model.fit(x = input_boards, y = [target_pis, target_vs], batch_size = args.batch_size, epochs = args.epochs)
+        self.nnet.model.fit(x=input_boards, y=[target_pis, target_vs], batch_size=args.batch_size, epochs=args.epochs)
 
     def predict(self, board):
         """
