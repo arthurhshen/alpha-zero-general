@@ -234,7 +234,6 @@ class MinichessGame(Game):
         Returns:
             r: 0 if game has not ended. 1 if player won, -1 if player lost,
                small non-zero value for draw.
-
         """
         b = Board()
         b.board = np.copy(board)
