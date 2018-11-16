@@ -4,7 +4,10 @@ import sys
 sys.path.append('..')
 from Game import Game
 # from MinichessLogic import Board
-from .MinichessLogic import Board
+try:
+    from .MinichessLogic import Board
+except ImportError:
+    from MinichessLogic import Board
 import numpy as np
 
 
@@ -201,7 +204,7 @@ class MinichessGame(Game):
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        return [(board, pi), (board[:, ::-1], pi[::-1])]
+        return [(board, pi)]
 
     def getValidMoves(self, board, player):
         """
