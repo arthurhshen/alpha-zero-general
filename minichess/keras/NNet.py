@@ -14,12 +14,12 @@ import argparse
 from .MiniChessNNet import MiniChessNNet as minichessnnet
 
 args = dotdict({
-    'lr': 0.005,
+    'lr': 0.001,
     'dropout': 0.3,
     'epochs': 100,
-    'batch_size': 64,
+    'batch_size': 256,
     'cuda': True,
-    'num_channels': 512,
+    'num_channels': 256,
 })
 
 
