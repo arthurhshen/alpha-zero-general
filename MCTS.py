@@ -131,6 +131,7 @@ class MCTS():
         start_square, end_square = self.game.index_dict[a]
 
         # print("Action: ", a)
+        # display(canonicalBoard)
         if abs(canonicalBoard[start_square[0]][start_square[1]]) == 1:
             # print(abs(canonicalBoard[start_square[0]][start_square[1]]))
             depth = 0
@@ -139,6 +140,8 @@ class MCTS():
             depth = 0
         else:
             depth = depth + 1
+
+        # print("Depth: ", depth)
 
         try:
             v = self.search(next_s, depth)
