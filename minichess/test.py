@@ -20,3 +20,6 @@ b.board = test
 g = Game(5, 5)
 print(b.get_legal_moves(1))
 print(g.getGameEnded(b.board, 1))
+
+
+print(g.index_dict[27])
