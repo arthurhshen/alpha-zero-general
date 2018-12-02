@@ -15,7 +15,7 @@ any agent.
 g = MinichessGame(5, 5)
 
 # minimax player
-minimax_p1 = MinimaxPlayer(g, 1).select_move_alphabeta
+minimax_p1 = MinimaxPlayer(g, 1).select_move
 
 # nnet players
 n1 = NNet(g)

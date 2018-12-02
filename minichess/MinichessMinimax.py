@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*
 
-"""
-COMS W4701 Artificial Intelligence - Programming Homework 2
-
-An AI player for Othello. This is the template file that you need to
-complete and submit.
-
-@author: Sejal Jain sj2735
-"""
 
 import random
 import sys
@@ -18,14 +10,14 @@ import numpy as np
 # You can use the functions in othello_shared to write your AI
 from .MinichessLogic import Board
 # from MinichessLogic import make_move, get_legal_moves
-
+explored = dict()
 
 class MinimaxPlayer():
 
     def __init__(self, game, player):
         self.game = game
         self.player = player
-        self.explored = dict()
+        #self.explored = dict()
 
     def compute_utility(self, board, player):
         # print("compute_utility")
@@ -139,150 +131,164 @@ class MinimaxPlayer():
 
         return((white_count, black_count))
 
-    ############ ALPHA-BETA PRUNING #####################
+    def min_node(self, board, player, alpha, beta, level, limit):
+        global explored
 
-    def alphabeta_min_node(self, board, player, alpha, beta, level, limit):
-        if player == 1:
-            opponent = -1
-        elif player == -1:
-            opponent = 1
-
-        if level >= limit:
-            return self.compute_utility(board, player)
-
-        else:
-            level = level + 1
-
-        if (board.tostring(), opponent) in self.explored:
-            return self.explored[(board.tostring(), opponent)]
-
-        b = Board()
-        b.board = np.copy(board)
-
-        moves = list(b.get_legal_moves(opponent))
-
-        '''
-        print("----------------------------------------")
-        print("In min_mode, generating possible moves for board for ", opponent)
-        print(b.board)
-        print(moves)
-        print("----------------------------------------")
-        '''
-        if len(moves) == 0:
-            ans = self.compute_utility(board, player)
-            return ans
-
-        v = float("inf")
-        # sort moves based on associated utility value for result board
-        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player))
-        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, opponent, x)[0], player))
-
-        for move in moves:
-            state = b.make_move(move, opponent)
-            # state = self.game.getNextState(board, opponent, move)[0]
-            if (state.tostring(), opponent) in self.explored:
-                val = self.explored[(state.tostring(), opponent)]
-            else:
-                '''
-                print("----------------------------------------")
-                print("In min_mode, sending to max_node")
-                print(state)
-                print(move)
-                print("----------------------------------------")
-                '''
-                val = self.alphabeta_max_node(state, player, alpha, beta, level, limit)
-                self.explored[(state.tostring(), opponent)] = val
-
-            v = min(v, val)
-            if v <= alpha:
-                return v
-
-            beta = min(beta, v)
-
-        return v
-
-    def alphabeta_max_node(self, board, player, alpha, beta, level, limit):
         if level >= limit:
             return self.compute_utility(board, player)
         else:
             level = level + 1
 
-        if (board.tostring(), player) in self.explored:
-            return self.explored[(board.tostring(), player)]
+        if (board.tostring(), player) in explored:
+            return explored[(board, tostring(), player)]
 
-        b = Board()
-        b.board = np.copy(board)
+        else:
+            if player == 1:
+                opponent = -1
+            elif player == -1:
+                opponent = 1
+            b = Board()
+            b.board = np.copy(board)
+            moves = list(b.get_legal_moves(opponent))
 
-        moves = list(b.get_legal_moves(player))
-        if len(moves) == 0:
-            ans = self.compute_utility(board, player)
-            return ans
+            if len(moves) == 0:
+                return self.compute_utility(b.board, player)
 
-        v = float("-inf")
-        # sort moves based on associated utility value for result board
-        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player), reverse=True)
-        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, player, x)[0], player), reverse=True)
-        for move in moves:
-            # state = b.make_move(move, player)
-            # state = self.game.getNextState(board, player, move)[0]
-            state = b.make_move(move, player)
-            if (state.tostring(), player) in self.explored:
-                val = self.explored[(state.tostring(), player)]
-            else:
-                val = self.alphabeta_min_node(state, player, alpha, beta, level, limit)
-                self.explored[(state.tostring(), player)] = val
+            if len(moves) > 5:
+                moves = moves[0:5]
 
-            v = max(v, val)
+            next_states = []
+            for move in moves:
+                next_states.append(player * self.compute_utility(b.make_move(move, opponent), player))
 
-            if v >= beta:
-                return v
+            # sorted moves by utility, takes into account which player it is from above line
+            indexes = list(range(len(next_states)))
+            indexes.sort(key=next_states.__getitem__)
+            moves = list(map(moves.__getitem__, indexes))
 
-            alpha = max(alpha, v)
-        return v
+            selected_move = -1
+            min_val = float("inf")
 
-    def select_move_alphabeta(self, board):
+            for move in moves:
+                state = b.make_move(move, opponent)
 
-        # For our program, the alpha-beta player will always be 1
+                if (state.tostring(), player) in explored:
+                    u = explored[(state.tostring(), player)]
+                else:
+                    u = self.max_node(state, player, alpha, beta, level, 5)
+                    explored[(state.tostring(), player)] = u
+
+                min_val = min(u, min_val)
+                if min_val <= alpha:
+                    return min_val
+
+                beta = min(beta, min_val)
+                
+
+            return min_val
+
+    def max_node(self, board, player, alpha, beta, level, limit):
+        global explored
+
+        if level >= limit:
+            return self.compute_utility(board, player)
+        else:
+            level = level + 1
+
+        if (board.tostring(), player) in explored:
+            return explored[(board, tostring(), player)]
+
+        else:
+            b = Board()
+            b.board = np.copy(board)
+            moves = list(b.get_legal_moves(player))
+
+            if len(moves) == 0:
+                return self.compute_utility(b.board, player)
+
+            if len(moves) > 5:
+                moves = moves[0:5]
+
+            next_states = []
+
+            for move in moves:
+                next_states.append(player * self.compute_utility(b.make_move(move, player), player))
+
+            # sorted moves by utility, takes into account which player it is from above line
+            indexes = list(range(len(next_states)))
+            indexes.sort(key=next_states.__getitem__)
+            moves = list(map(moves.__getitem__, indexes))
+
+            selected_move = -1
+            max_val = float("-inf")
+
+            for move in moves:
+                state = b.make_move(move, player)
+
+                if (state.tostring(), player) in explored:
+                    u = explored[(state.tostring(), player)]
+                else:
+                    u = self.min_node(state, player, alpha, beta, level, 5)
+                    explored[(state.tostring(), player)] = u
+
+                max_val = max(max_val, u)
+                if max_val >= beta:
+                    return max_val
+                
+                alpha = max(alpha, max_val)
+
+            return max_val
+
+
+        
+
+    def select_move(self, board):
+        global explored
+
         player = self.player
-
         b = Board()
         b.board = np.copy(board)
 
-        # print("in select_move_alphabeta")
-        # print(b.board)
-
-        selected_move = -1
         moves = list(b.get_legal_moves(player))
+        if len(moves) > 5:
+            moves = moves[0:5]
+        next_states = []
+        for move in moves:
+            next_states.append(player * self.compute_utility(b.make_move(move, player), player))
+        print(moves)
+        print(next_states)
+        # sorted moves by utility, takes into account which player it is from above line
+        indexes = list(range(len(next_states)))
+        indexes.sort(key=next_states.__getitem__)
+        moves = list(map(moves.__getitem__, indexes))
+        print(moves)
+        selected_move = -1
         minimax_val = float("-inf")
 
-        # sort moves based on associated utility value for result board
-        # moves.sort(key=lambda x: self.compute_utility(b.make_move(x, player), player), reverse=True)
-        # moves.sort(key=lambda x: self.compute_utility(self.game.getNextState(board, player, x)[0], player), reverse=True)
-        # print(moves)
+        # iterate through moves
         for move in moves:
-            # state = b.make_move(move, player)
-            # state = self.game.getNextState(board, player, move)[0]
             state = b.make_move(move, player)
-            if (state.tostring(), player) in self.explored:
-                u = self.explored[(state.tostring(), player)]
+
+            if (state.tostring(), player) in explored:
+                u = explored[(state.tostring(), player)]
             else:
-                '''
-                print("----------------------------------------")
-                print("Sending this state to be evaluated by alphabeta_min_node")
-                print(state)
-                print("----------------------------------------")
-                '''
-                u = self.alphabeta_min_node(state, player, float("-inf"), float("inf"), 0, 5)
-                self.explored[(state.tostring(), player)] = u
+                u = self.min_node(state, player, float("-inf"), float("inf"), 0, 5)
+                explored[(state.tostring(), player)] = u
             if u > minimax_val:
                 minimax_val = u
                 selected_move = move
+
         print("Selected move: ", selected_move)
 
         index = self.game.action_dict[selected_move]
+        explored = dict()
 
-        # reset explored set after each move
-        print(len(self.explored))
-        self.explored = dict()
+        return index
 
-        return(index)
+
+
+
+
+
+
+
