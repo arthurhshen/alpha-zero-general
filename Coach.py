@@ -186,7 +186,6 @@ class Coach():
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
 
-                    '''
                     # Drop 80% of draws
                     examples = self.executeEpisode()
                     to_add = False
@@ -199,8 +198,8 @@ class Coach():
                         to_add = True
                     if to_add:
                         iterationTrainExamples += examples
-                    '''
-                    iterationTrainExamples = self.executeEpisode()
+
+                    # iterationTrainExamples = self.executeEpisode()
 
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
