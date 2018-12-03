@@ -46,7 +46,7 @@ class Coach():
         episodeStep = 0
 
         # Three fold repetition
-        seen_postions = dict()
+        seen_positions = dict()
 
         # Fifty move count
         depth = 0
@@ -85,31 +85,76 @@ class Coach():
 
             if depth >= 100:
                 r = 1e-8
+                self.curPlayer *= -1
                 return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
             board_string = self.game.stringRepresentation(board)
-            if board_string in seen_postions:
-                seen_postions[board_string] += 1
-                if seen_postions[board_string] >= 3:
+            if board_string in seen_positions:
+                seen_positions[board_string] += 1
+                if seen_positions[board_string] >= 3:
                     r = 1e-8
+                    self.curPlayer *= -1
                     return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
             else:
-                seen_postions[board_string] = 1
+                seen_positions[board_string] = 1
 
-            # orig
-            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            try:
+                board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            except AssertionError:
+                # Redo everythign from start
+                self.curPlayer *= -1
+                canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
+
+                temp = int(episodeStep < self.args.tempThreshold)
+
+                pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
+                sym = self.game.getSymmetries(canonicalBoard, pi)
+                for b, p in sym:
+                    trainExamples.append([b, self.curPlayer, p, None])
+                print("\n========NEW MOVE=========")
+                print("player: ", self.curPlayer)
+                print("current board:")
+                self.game.display(board)
+                action = np.random.choice(len(pi), p=pi)
+                print("action: ")
+                print(self.game.index_dict[action])
+
+                # Check to see if a pawn was moved, or if a piece was captured
+                start_square, end_square = self.game.index_dict[action]
+
+                # print("Action: ", a)
+                # display(canonicalBoard)
+                if abs(board[start_square[0]][start_square[1]]) == 1:
+                    # print(abs(canonicalBoard[start_square[0]][start_square[1]]))
+                    depth = 0
+                elif board[end_square[0]][end_square[1]] != 0:
+                    # print(canonicalBoard[end_square[0]][end_square[1]])
+                    depth = 0
+                else:
+                    depth = depth + 1
+
+                if depth >= 100:
+                    r = 1e-8
+                    # Reverse self.curPlayer if the game terminates early
+                    self.curPlayer *= -1
+                    return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
+
+                board_string = self.game.stringRepresentation(board)
+                if board_string in seen_positions:
+                    seen_positions[board_string] += 1
+                    if seen_positions[board_string] >= 3:
+                        r = 1e-8
+                        self.curPlayer *= -1
+                        return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
+
+                else:
+                    seen_positions[board_string] = 1
 
             r = self.game.getGameEnded(board, self.curPlayer)
 
             if r != 0:
-                print("\n========NEW MOVE=========")
-                print("player: ", self.curPlayer)
-                print("current board:")
-                print(self.game.display(board))
-                action = np.random.choice(len(pi), p=pi)
-                print("action: ")
-                print(self.game.index_dict[action])
+                self.game.display(board)
                 if r == 1:
                     print ("Player -1 Wins")
                 if r == -1:
@@ -141,6 +186,7 @@ class Coach():
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)   # reset search tree
 
+                    '''
                     # Drop 80% of draws
                     examples = self.executeEpisode()
                     to_add = False
@@ -153,6 +199,8 @@ class Coach():
                         to_add = True
                     if to_add:
                         iterationTrainExamples += examples
+                    '''
+                    iterationTrainExamples = self.executeEpisode()
 
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)

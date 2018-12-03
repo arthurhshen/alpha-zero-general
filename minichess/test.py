@@ -29,3 +29,14 @@ test_dict = {1: 2}
 
 test_dict[1] += 1
 print(test_dict)
+
+
+def test_func(test=dict()):
+    print(type(test))
+
+
+test_func()
+test_func(1)
+
+test_list = [1 / 10] * 10
+print(test_list)

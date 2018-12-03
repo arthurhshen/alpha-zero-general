@@ -47,10 +47,27 @@ class MCTS():
             return probs
 
         counts = [x**(1. / temp) for x in counts]
-        probs = [x / float(sum(counts)) for x in counts]
+
+        # Original:
+        # probs = [x / float(sum(counts)) for x in counts]
+
+        # Workaround - not sure what's causing this bug
+        if sum(counts) != 0:
+            probs = [x / float(sum(counts)) for x in counts]
+        else:
+            print("In workaround for sum = 0")
+            valids = self.game.getValidMoves(canonicalBoard, 1)
+            sum_valids = sum(valids)
+
+            probs = [x / sum_valids for x in valids]
+
+            # probs = [1 / len(counts)] * len(counts)
+
+        # End of edit
+
         return probs
 
-    def search(self, canonicalBoard, depth=0):
+    def search(self, canonicalBoard, depth=0, seen_positions=dict(), end=False):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -70,14 +87,18 @@ class MCTS():
             v: the negative of the value of the current canonicalBoard
         """
 
-        if depth >= 100:
-            return 1e-8
-
         s = self.game.stringRepresentation(canonicalBoard)
 
         game_end_score = self.game.getGameEnded(canonicalBoard, 1)
         if game_end_score != 0:
             return -game_end_score
+
+        if depth >= 100:
+            return -1e-8
+
+        # passed in as True if we have a 3-fold repetition
+        if end:
+            return -1e-8
 
         # if s not in self.Es:
         #     self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
@@ -141,12 +162,21 @@ class MCTS():
             depth = depth + 1
 
         # print("Depth: ", depth)
+        board_string = self.game.stringRepresentation(canonicalBoard)
+        if board_string in seen_positions:
+            seen_positions[board_string] += 1
+            if seen_positions[board_string] >= 3:
+                # print("Threefold in MCTS!")
+                end = True
+
+        else:
+            seen_positions[board_string] = 1
 
         try:
-            v = self.search(next_s, depth)
+            v = self.search(next_s, depth, seen_positions, end)
         except:
             print("Exception in MCTS - search")
-            return 1e-8
+            return -1e-8
 
         if (s, a) in self.Qsa:
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
