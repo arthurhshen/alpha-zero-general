@@ -23,3 +23,9 @@ print(g.getGameEnded(b.board, 1))
 
 
 print(g.index_dict[27])
+
+
+test_dict = {1: 2}
+
+test_dict[1] += 1
+print(test_dict)

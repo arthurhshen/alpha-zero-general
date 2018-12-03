@@ -127,7 +127,6 @@ class MCTS():
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
         # Check to see if a pawn was moved, or if a piece was captured
-
         start_square, end_square = self.game.index_dict[a]
 
         # print("Action: ", a)

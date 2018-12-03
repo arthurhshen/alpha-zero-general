@@ -45,6 +45,12 @@ class Coach():
         self.curPlayer = 1
         episodeStep = 0
 
+        # Three fold repetition
+        seen_postions = dict()
+
+        # Fifty move count
+        depth = 0
+
         while True:
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
@@ -58,10 +64,39 @@ class Coach():
             print("\n========NEW MOVE=========")
             print("player: ", self.curPlayer)
             print("current board:")
-            print(self.game.display(board))
+            self.game.display(board)
             action = np.random.choice(len(pi), p=pi)
             print("action: ")
             print(self.game.index_dict[action])
+
+            # Check to see if a pawn was moved, or if a piece was captured
+            start_square, end_square = self.game.index_dict[action]
+
+            # print("Action: ", a)
+            # display(canonicalBoard)
+            if abs(board[start_square[0]][start_square[1]]) == 1:
+                # print(abs(canonicalBoard[start_square[0]][start_square[1]]))
+                depth = 0
+            elif board[end_square[0]][end_square[1]] != 0:
+                # print(canonicalBoard[end_square[0]][end_square[1]])
+                depth = 0
+            else:
+                depth = depth + 1
+
+            if depth >= 100:
+                r = 1e-8
+                return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
+
+            board_string = self.game.stringRepresentation(board)
+            if board_string in seen_postions:
+                seen_postions[board_string] += 1
+                if seen_postions[board_string] >= 3:
+                    r = 1e-8
+                    return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
+
+            else:
+                seen_postions[board_string] = 1
+
             # orig
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
 
@@ -80,7 +115,7 @@ class Coach():
                 if r == -1:
                     print ("Player 1 Wins")
                 else:
-                    print ("Stalemate")
+                    print ("Draw")
                 return [(x[0], x[2], r * ((-1)**(x[1] != self.curPlayer))) for x in trainExamples]
 
     def learn(self):
