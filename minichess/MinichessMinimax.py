@@ -6,11 +6,13 @@ import random
 import sys
 import time
 import numpy as np
+import time
 
 # You can use the functions in othello_shared to write your AI
 from .MinichessLogic import Board
 # from MinichessLogic import make_move, get_legal_moves
 explored = dict()
+count = 0
 
 class MinimaxPlayer():
 
@@ -132,6 +134,7 @@ class MinimaxPlayer():
         return((white_count, black_count))
 
     def min_node(self, board, player, alpha, beta, level, limit):
+        global count
         global explored
 
         if level >= limit:
@@ -171,6 +174,7 @@ class MinimaxPlayer():
 
             for move in moves:
                 state = b.make_move(move, opponent)
+                count += 1
 
                 if (state.tostring(), player) in explored:
                     u = explored[(state.tostring(), player)]
@@ -188,6 +192,7 @@ class MinimaxPlayer():
             return min_val
 
     def max_node(self, board, player, alpha, beta, level, limit):
+        global count
         global explored
 
         if level >= limit:
@@ -224,6 +229,7 @@ class MinimaxPlayer():
 
             for move in moves:
                 state = b.make_move(move, player)
+                count += 1
 
                 if (state.tostring(), player) in explored:
                     u = explored[(state.tostring(), player)]
@@ -244,6 +250,9 @@ class MinimaxPlayer():
 
     def select_move(self, board):
         global explored
+        global count
+
+        start_time = time.time()
 
         player = self.player
         b = Board()
@@ -255,19 +264,20 @@ class MinimaxPlayer():
         next_states = []
         for move in moves:
             next_states.append(player * self.compute_utility(b.make_move(move, player), player))
-        print(moves)
-        print(next_states)
+        #print(moves)
+        #print(next_states)
         # sorted moves by utility, takes into account which player it is from above line
         indexes = list(range(len(next_states)))
         indexes.sort(key=next_states.__getitem__)
         moves = list(map(moves.__getitem__, indexes))
-        print(moves)
+        #print(moves)
         selected_move = -1
         minimax_val = float("-inf")
 
         # iterate through moves
         for move in moves:
             state = b.make_move(move, player)
+            count += 1
 
             if (state.tostring(), player) in explored:
                 u = explored[(state.tostring(), player)]
@@ -278,7 +288,11 @@ class MinimaxPlayer():
                 minimax_val = u
                 selected_move = move
 
+        end_time = time.time()
+
         print("Selected move: ", selected_move)
+        print("Total explored positions: ", count)
+        print("Time: ", end_time-start_time)
 
         index = self.game.action_dict[selected_move]
         explored = dict()
