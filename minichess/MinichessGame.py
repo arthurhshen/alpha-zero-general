@@ -14,8 +14,9 @@ import numpy as np
 # To make this more efficient - in getGameEnded, just find 1 legal move instead of them all
 
 class MinichessGame(Game):
-    def __init__(self, r, c):
+    def __init__(self, r, c, history=8):
         self.dim = (r, c)
+        self.history = history
 
         # Returns action_dict
         def getActionDict():
@@ -127,7 +128,12 @@ class MinichessGame(Game):
 
     def getInitBoard(self):
         # return initial board (numpy board)
+
+        # Initial board is a dim X (8 + 1) 3D array that gets flattened into a 2D array
+        # history = 8, the last dimension is the move count.
+
         b = Board(self.dim)
+
         return np.array(b.board)
 
     def getBoardSize(self):
@@ -135,7 +141,10 @@ class MinichessGame(Game):
         Returns:
             (x,y): a tuple of board dimensions
         """
-        return(self.dim)
+
+        # Initial board is a dim X (8 + 1) 3D array that gets flattened into a 2D array
+        # history = 8, the last dimension is the move count.
+        return((self.dim[0] * (self.history + 2), self.dim[1]))
 
     def getActionSize(self):
         """
@@ -159,7 +168,7 @@ class MinichessGame(Game):
         # Action is in the format ((start square), (end square))
         # Board is a numpy array of the current board state.
 
-        b = Board()
+        b = Board(new_board=board)
 
         # Flip the board if player is -1 and keep it the same if player = 1
         b.board = self.getCanonicalForm(board, player)
@@ -177,6 +186,9 @@ class MinichessGame(Game):
         return(new_board, -player)
 
     def getCanonicalForm(self, board, player):
+
+        # TODO:
+        # Rewrite getCanonicalForm to take into account history (new dimensions)
         """
         Input:
             board: current board
@@ -191,11 +203,21 @@ class MinichessGame(Game):
                             the colors and return the board. -- that's not true for
                             chess - we need to reverse the coordinates too
         """
+
+        whole_board = board.reshape((self.history + 2, self.dim[0], self.dim[1]))
+
+        curr_board = whole_board[0]
+
         if player == 1:
             return(board)
 
         # flips the board so the coordinates are correct (for promotion) and multiplies by -1
-        board = np.flip(board, 0) * -1
+        curr_board = np.flip(curr_board, 0) * -1
+
+        whole_board[0] = curr_board
+
+        board = whole_board.reshape(((self.history + 2) * self.dim[0], self.dim[1]))
+
         return(board)
 
     def stringRepresentation(self, board):
@@ -218,8 +240,8 @@ class MinichessGame(Game):
                         0 for invalid moves
         """
         valid_moves = [0] * self.getActionSize()
-        b = Board()
-        b.board = np.copy(board)
+        b = Board(new_board=board)
+        # b.board = np.copy(board)
 
         moves = b.get_legal_moves(player)
         for move in moves:
@@ -237,9 +259,13 @@ class MinichessGame(Game):
             r: 0 if game has not ended. 1 if player won, -1 if player lost,
                small non-zero value for draw.
         """
-        b = Board()
-        b.board = np.copy(board)
+        b = Board(new_board=board)
 
+        if b.repetition_draw():
+            return(1e-8)
+
+        if b.fifty_moves():
+            return(1e-8)
         # print(b.board)
 
         if len(b.get_legal_moves(player)) > 0:

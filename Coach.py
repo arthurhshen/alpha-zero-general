@@ -55,6 +55,9 @@ class Coach():
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
 
+            print("canonicalBoard that is passed in")
+            print(canonicalBoard)
+
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
@@ -103,6 +106,7 @@ class Coach():
                 board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
             except AssertionError:
                 # Redo everythign from start
+                print("AssertionError in Coach.py")
                 self.curPlayer *= -1
                 canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
 
