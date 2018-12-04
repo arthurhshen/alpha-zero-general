@@ -55,8 +55,8 @@ class Coach():
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
 
-            print("canonicalBoard that is passed in")
-            print(canonicalBoard)
+            # print("canonicalBoard that is passed in")
+            # print(canonicalBoard)
 
             temp = int(episodeStep < self.args.tempThreshold)
 

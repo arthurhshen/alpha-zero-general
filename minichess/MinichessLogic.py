@@ -154,9 +154,7 @@ class Board():
         board = self.board.reshape((self.history + 2, self.dim[0], self.dim[1]))
 
         curr_board = board[0]
-        print("Current board state: ")
-        print(curr_board)
-        print("Getting legal moves for player ", player)
+
         for r in range(rows):
             for c in range(cols):
                 piece = curr_board[r][c]

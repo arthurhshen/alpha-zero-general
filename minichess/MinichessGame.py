@@ -285,6 +285,9 @@ class MinichessGame(Game):
                 return 1e-8
 
     def display(self, board):
+
+        curr_board = board[:5, :]
+
         UNICODE_PIECES = {
             -4: u'♜', -2: u'♞', -3: u'♝', -5: u'♛',
             -6: u'♚', -1: u'♟', 4: u'♖', 2: u'♘',
@@ -292,9 +295,9 @@ class MinichessGame(Game):
             None: ' '
         }
         print('   ——   ——   ——   ——   —— ')
-        for x in range(board.shape[0]):
-            for y in range(board.shape[1]):
-                p = board[x][y]
+        for x in range(curr_board.shape[0]):
+            for y in range(curr_board.shape[1]):
+                p = curr_board[x][y]
                 if p != 0:
                     print(' | ' + UNICODE_PIECES[p] + ' ', end='')
                 else:
