@@ -2,7 +2,10 @@
 import sys
 # Sets the path to the general alpha-zero folder
 sys.path.append('..')
-from Game import Game
+try:
+    from Game import Game
+except ImportError:
+    from .Game import Game
 # from MinichessLogic import Board
 try:
     from .MinichessLogic import Board
@@ -188,7 +191,7 @@ class MinichessGame(Game):
     def getCanonicalForm(self, board, player):
 
         # TODO:
-        # Rewrite getCanonicalForm to take into account history (new dimensions)
+        # Rewrite getCanonicalFrom to flip every board in the history
         """
         Input:
             board: current board
@@ -204,21 +207,24 @@ class MinichessGame(Game):
                             chess - we need to reverse the coordinates too
         """
 
-        whole_board = board.reshape((self.history + 2, self.dim[0], self.dim[1]))
-
-        curr_board = whole_board[0]
-
         if player == 1:
             return(board)
 
-        # flips the board so the coordinates are correct (for promotion) and multiplies by -1
-        curr_board = np.flip(curr_board, 0) * -1
+        whole_board = np.copy(board)
 
-        whole_board[0] = curr_board
+        whole_board = whole_board.reshape((self.history + 2, self.dim[0], self.dim[1]))
 
-        board = whole_board.reshape(((self.history + 2) * self.dim[0], self.dim[1]))
+        # 0th index is the current board state
+        # 1-history index are the historical board states
+        # history+1 index is the move count state
 
-        return(board)
+        for i in range(self.history + 1):
+            # flips the board so the coordinates are correct (for promotion) and multiplies by -1
+            whole_board[i] = np.flip(whole_board[i], 0) * -1
+
+        canon_board = whole_board.reshape(((self.history + 2) * self.dim[0], self.dim[1]))
+
+        return(canon_board)
 
     def stringRepresentation(self, board):
         # 8x8 numpy array (canonical board)
