@@ -550,10 +550,12 @@ class Board():
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         up_right = False
+                '''
                 # Either the diagonal has ended (no longer on the board) or their is a
                 # piece of 'player' color in the way
                 else:
                     up_right = False
+                '''
 
             # Up and left diagonal
             if up_left:
@@ -566,10 +568,12 @@ class Board():
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         up_left = False
+                '''
                 # Either the diagonal has ended (no longer on the board) or their is a
                 # piece of 'player' color in the way
                 else:
                     up_left = False
+                '''
 
             if down_right:
                 new_r = row - offset
@@ -581,10 +585,12 @@ class Board():
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         down_right = False
+                '''
                 # Either the diagonal has ended (no longer on the board) or their is a
                 # piece of 'player' color in the way
                 else:
                     down_right = False
+                '''
 
             if down_left:
                 new_r = row - offset
@@ -596,10 +602,12 @@ class Board():
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         down_left = False
+                '''
                 # Either the diagonal has ended (no longer on the board) or there is a
                 # piece of 'player' color in the way
                 else:
                     down_left = False
+                '''
 
         return(moves)
 
@@ -623,10 +631,12 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         up = False
+                '''
                 else:
                     # Either the file has ended (no longer on the board) or there is a
                     # piece of 'player' color in the way
                     up = False
+                '''
             if down:
                 new_r = row - offset
 
@@ -636,10 +646,12 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         down = False
+                '''
                 else:
                     # Either the file has ended (no longer on the board) or there is a
                     # piece of 'player' color in the way
                     down = False
+                '''
 
             if left:
                 new_c = col - offset
@@ -649,10 +661,12 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the rank, so set flag = False
                         left = False
+                '''
                 else:
                     # Either the rank has ended (no longer on the board) or there is a
                     # piece of 'player' color in the way
                     left = False
+                '''
 
             if right:
                 new_c = col + offset
@@ -662,10 +676,12 @@ class Board():
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the diagonal, so set flag = False
                         right = False
+                '''
                 else:
                     # Either the rank has ended (no longer on the board) or there is a
                     # piece of 'player' color in the way
                     right = False
+                '''
 
         return(moves)
 

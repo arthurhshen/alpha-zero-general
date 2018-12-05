@@ -1,6 +1,6 @@
 import numpy as np
-from MinichessLogic import Board
-from MinichessGame import MinichessGame as Game
+from minichess.MinichessLogic import Board
+from minichess.MinichessGame import MinichessGame as Game
 
 '''
 row1 = '[[ 0,  0,  0,  0,  6],'
@@ -18,6 +18,31 @@ g = Game(5, 5)
 
 b = Board()
 
+
+row1 = '[[ 0,  0,  3,  6,  0],'
+row2 = ' [ 4,  1,  0,  0,  0],'
+row3 = ' [-2,  0, -3,  0,  0],'
+row4 = ' [-1,  0,  1,  -5, -1],'
+row5 = ' [-2,  0,  5,  0, -6]]'
+
+test = row1 + row2 + row3 + row4 + row5
+
+test = np.array(eval(test))
+
+# print(test)
+# g.display(test)
+
+test = np.array(test)
+for i in range(8 + 1):
+    new_array = np.zeros((5, 5))
+    test = np.concatenate((test, new_array))
+
+test.astype(int)
+
+b = Board(new_board=test)
+g.display(b.board)
+print(b.get_legal_moves(-1))
+'''
 # print(b.board.shape)
 
 # print(b.board.reshape(10, 5, 5)[0])
@@ -67,7 +92,7 @@ for i in range(10):
 # b = Board(b.make_move(((0, 1), (2, 0)), 1))
 
 print(b.fifty_moves())
-
+'''
 
 # print(b.board)
 '''
