@@ -198,6 +198,13 @@ class Board():
 
         return(moves)
 
+    def is_real_square(self, row, col):
+        # Helper function for generating rook and bishop moves; if you have time get rid of this
+        rows, cols = self.dim
+        if row < 0 or row >= rows or col < 0 or col >= cols:
+            return(False)
+        return(True)
+
     def _check_square(self, orig_row, orig_col, new_row, new_col, player, curr_board, check_checks=True):
         # Returns True if the player can move a piece to the square
         # (new_row, new_col) and False if the square is occupied by
@@ -538,76 +545,98 @@ class Board():
         down_right = True
         down_left = True
 
+        currently_check = self._is_check(curr_board, player)
+
         for offset in range(1, min(rows, cols)):
             # Up and right diagonal
             if up_right:
                 new_r = row + offset
                 new_c = col + offset
 
-                if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, new_c)))
+                if self.is_real_square(new_r, new_c):
+
+                    if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, new_c)))
+
+                    # Either the diagonal has ended (no longer on the board) or their is a
+                    # piece of 'player' color in the way
+                    else:
+                        if not currently_check:
+                            up_right = False
+
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         up_right = False
-                '''
-                # Either the diagonal has ended (no longer on the board) or their is a
-                # piece of 'player' color in the way
+
                 else:
                     up_right = False
-                '''
 
             # Up and left diagonal
             if up_left:
                 new_r = row + offset
                 new_c = col - offset
 
-                if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, new_c)))
+                if self.is_real_square(new_r, new_c):
+
+                    if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, new_c)))
+
+                    # Either the diagonal has ended (no longer on the board) or their is a
+                    # piece of 'player' color in the way
+                    else:
+                        if not currently_check:
+                            up_left = False
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         up_left = False
-                '''
-                # Either the diagonal has ended (no longer on the board) or their is a
-                # piece of 'player' color in the way
+
                 else:
                     up_left = False
-                '''
 
             if down_right:
                 new_r = row - offset
                 new_c = col + offset
 
-                if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, new_c)))
+                if self.is_real_square(new_r, new_c):
+
+                    if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, new_c)))
+
+                    # Either the diagonal has ended (no longer on the board) or their is a
+                    # piece of 'player' color in the way
+                    else:
+                        if not currently_check:
+                            down_right = False
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         down_right = False
-                '''
-                # Either the diagonal has ended (no longer on the board) or their is a
-                # piece of 'player' color in the way
                 else:
                     down_right = False
-                '''
 
             if down_left:
                 new_r = row - offset
                 new_c = col - offset
 
-                if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, new_c)))
+                if self.is_real_square(new_r, new_c):
+
+                    if self._check_square(row, col, new_r, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, new_c)))
+
+                    # Either the diagonal has ended (no longer on the board) or there is a
+                    # piece of 'player' color in the way
+                    else:
+                        if not currently_check:
+                            down_left = False
+
                     # If the square contains a piece that is captured, then we can no longer
                     # continue on the diagonal, so set up_right = False
                     if curr_board[new_r][new_c] != 0:
                         down_left = False
-                '''
-                # Either the diagonal has ended (no longer on the board) or there is a
-                # piece of 'player' color in the way
                 else:
                     down_left = False
-                '''
 
         return(moves)
 
@@ -615,6 +644,7 @@ class Board():
         moves = set()
         rows, cols = self.dim
 
+        currently_check = self._is_check(curr_board, player)
         # There's probably a better way of finding these moves - maybe use takewhile
         up = True
         down = True
@@ -625,63 +655,86 @@ class Board():
             if up:
                 new_r = row + offset
 
-                if self._check_square(row, col, new_r, col, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, col)))
+                if self.is_real_square(new_r, col):
+                    if self._check_square(row, col, new_r, col, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, col)))
+
+                    else:
+                        # Either the file has ended (no longer on the board) or there is a
+                        # piece of 'player' color in the way, or the player is in check and
+                        # cannot move the piece. If the piece can block or capture, however,
+                        # we do not want to terminate the search
+                        if not currently_check:
+                            up = False
+
                     if curr_board[new_r][col] != 0:
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         up = False
-                '''
                 else:
-                    # Either the file has ended (no longer on the board) or there is a
-                    # piece of 'player' color in the way
                     up = False
-                '''
+
             if down:
                 new_r = row - offset
+                if self.is_real_square(new_r, col):
+                    if self._check_square(row, col, new_r, col, player, curr_board, check_checks):
+                        moves.add(((row, col), (new_r, col)))
 
-                if self._check_square(row, col, new_r, col, player, curr_board, check_checks):
-                    moves.add(((row, col), (new_r, col)))
+                    else:
+                        # Either the file has ended (no longer on the board) or there is a
+                        # piece of 'player' color in the way
+                        if not currently_check:
+                            down = False
+
                     if curr_board[new_r][col] != 0:
                         # If the square contains a piece that is captured, then we can no longer
                         # continue on the file, so set flag = False
                         down = False
-                '''
                 else:
-                    # Either the file has ended (no longer on the board) or there is a
-                    # piece of 'player' color in the way
                     down = False
-                '''
 
             if left:
                 new_c = col - offset
-                if self._check_square(row, col, row, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (row, new_c)))
+
+                if self.is_real_square(row, new_c):
+
+                    if self._check_square(row, col, row, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (row, new_c)))
+
+                    else:
+                        # Either the rank has ended (no longer on the board) or there is a
+                        # piece of 'player' color in the way
+                        if not currently_check:
+                            left = False
+
                     if curr_board[row][new_c] != 0:
-                        # If the square contains a piece that is captured, then we can no longer
-                        # continue on the rank, so set flag = False
+                            # If the square contains a piece that is captured, then we can no longer
+                            # continue on the rank, so set flag = False
                         left = False
-                '''
+
                 else:
-                    # Either the rank has ended (no longer on the board) or there is a
-                    # piece of 'player' color in the way
                     left = False
-                '''
 
             if right:
                 new_c = col + offset
-                if self._check_square(row, col, row, new_c, player, curr_board, check_checks):
-                    moves.add(((row, col), (row, new_c)))
+
+                if self.is_real_square(row, new_c):
+
+                    if self._check_square(row, col, row, new_c, player, curr_board, check_checks):
+                        moves.add(((row, col), (row, new_c)))
+
+                    else:
+                        # Either the rank has ended (no longer on the board) or there is a
+                        # piece of 'player' color in the way
+                        if not currently_check:
+                            right = False
+
                     if curr_board[row][new_c] != 0:
-                        # If the square contains a piece that is captured, then we can no longer
-                        # continue on the diagonal, so set flag = False
+                            # If the square contains a piece that is captured, then we can no longer
+                            # continue on the diagonal, so set flag = False
                         right = False
-                '''
                 else:
-                    # Either the rank has ended (no longer on the board) or there is a
-                    # piece of 'player' color in the way
                     right = False
-                '''
 
         return(moves)
 
