@@ -45,11 +45,13 @@ class Coach():
         self.curPlayer = 1
         episodeStep = 0
 
+        '''
         # Three fold repetition
         seen_positions = dict()
 
         # Fifty move count
         depth = 0
+        '''
 
         while True:
             episodeStep += 1
@@ -72,6 +74,7 @@ class Coach():
             print("action: ")
             print(self.game.index_dict[action])
 
+            '''
             # Check to see if a pawn was moved, or if a piece was captured
             start_square, end_square = self.game.index_dict[action]
 
@@ -101,7 +104,10 @@ class Coach():
 
             else:
                 seen_positions[board_string] = 1
+            '''
 
+            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
+            '''
             try:
                 board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
             except AssertionError:
@@ -154,6 +160,7 @@ class Coach():
 
                 else:
                     seen_positions[board_string] = 1
+            '''
 
             r = self.game.getGameEnded(board, self.curPlayer)
 
@@ -246,6 +253,13 @@ class Coach():
             if pwins + nwins > 0 and float(nwins) / (pwins + nwins) < self.args.updateThreshold:
                 print('REJECTING NEW MODEL')
                 self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
+            # Original code does not take into account all draws; in the case that every game is drawn
+            # the new model will be accepted.
+
+            elif pwins + nwins == 0:
+                print('REJECTING NEW MODEL')
+                self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
+
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))

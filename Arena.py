@@ -36,6 +36,7 @@ class Arena():
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
 
+        '''
         # Add 50 move rule and repetitions
 
         # counts half moves (will need to get to 100)
@@ -43,6 +44,7 @@ class Arena():
 
         # 3 fold repetition
         seen_positions = dict()
+        '''
 
         players = [self.player2, None, self.player1]
         curPlayer = 1
@@ -66,6 +68,7 @@ class Arena():
                         print(self.game.index_dict[i])
                 assert valids[action] > 0
 
+            '''
             start_square, end_square = self.game.index_dict[action]
 
             # 50 move rule
@@ -83,6 +86,7 @@ class Arena():
             if moves_no_progress >= 100:
                 return 1e-8
 
+
             # 3 fold repetition
             board_string = self.game.stringRepresentation(board)
             if board_string in seen_positions:
@@ -91,6 +95,7 @@ class Arena():
                     return 1e-8
             else:
                 seen_positions[board_string] = 1
+            '''
 
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
 

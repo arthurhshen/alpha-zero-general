@@ -67,7 +67,8 @@ class MCTS():
 
         return probs
 
-    def search(self, canonicalBoard, depth=0, seen_positions=dict(), end=False):
+    # def search(self, canonicalBoard, depth=0, seen_positions=dict(), end=False):
+    def search(self, canonicalBoard):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -93,12 +94,14 @@ class MCTS():
         if game_end_score != 0:
             return -game_end_score
 
+        '''
         if depth >= 100:
             return -1e-8
 
         # passed in as True if we have a 3-fold repetition
         if end:
             return -1e-8
+        '''
 
         # if s not in self.Es:
         #     self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
@@ -147,6 +150,7 @@ class MCTS():
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
+        '''
         # Check to see if a pawn was moved, or if a piece was captured
         start_square, end_square = self.game.index_dict[a]
 
@@ -171,9 +175,10 @@ class MCTS():
 
         else:
             seen_positions[board_string] = 1
+        '''
 
         try:
-            v = self.search(next_s, depth, seen_positions, end)
+            v = self.search(next_s)
         except:
             print("Exception in MCTS - search")
             return -1e-8

@@ -14,18 +14,22 @@ from .MinichessLogic import Board
 explored = dict()
 count = 0
 
+
 class MinimaxPlayer():
 
     def __init__(self, game, player):
         self.game = game
         self.player = player
-        #self.explored = dict()
-
+        # self.explored = dict()
+ 
     def compute_utility(self, board, player):
         # print("compute_utility")
         # print(board)
         # print(player)
-        isEnded = self.getGameEnded(board, player)
+
+        curr_board = np.copy(board.reshape(10, 5, 5)[0])
+
+        isEnded = self.game.getGameEnded(board, player)
         if abs(isEnded) == 1:
             if isEnded == -1:
                 return(float(-100000))
@@ -36,7 +40,7 @@ class MinimaxPlayer():
             return(0)
 
         # Evaluate the position
-        white_mat, black_mat = self.get_material(board)
+        white_mat, black_mat = self.get_material(curr_board)
 
         mat_ratio = float('-inf')
 
@@ -187,7 +191,6 @@ class MinimaxPlayer():
                     return min_val
 
                 beta = min(beta, min_val)
-                
 
             return min_val
 
@@ -240,13 +243,10 @@ class MinimaxPlayer():
                 max_val = max(max_val, u)
                 if max_val >= beta:
                     return max_val
-                
+
                 alpha = max(alpha, max_val)
 
             return max_val
-
-
-        
 
     def select_move(self, board):
         global explored
@@ -264,13 +264,13 @@ class MinimaxPlayer():
         next_states = []
         for move in moves:
             next_states.append(player * self.compute_utility(b.make_move(move, player), player))
-        #print(moves)
-        #print(next_states)
+        # print(moves)
+        # print(next_states)
         # sorted moves by utility, takes into account which player it is from above line
         indexes = list(range(len(next_states)))
         indexes.sort(key=next_states.__getitem__)
         moves = list(map(moves.__getitem__, indexes))
-        #print(moves)
+        # print(moves)
         selected_move = -1
         minimax_val = float("-inf")
 
@@ -292,17 +292,9 @@ class MinimaxPlayer():
 
         print("Selected move: ", selected_move)
         print("Total explored positions: ", count)
-        print("Time: ", end_time-start_time)
+        print("Time: ", end_time - start_time)
 
         index = self.game.action_dict[selected_move]
         explored = dict()
 
         return index
-
-
-
-
-
-
-
-

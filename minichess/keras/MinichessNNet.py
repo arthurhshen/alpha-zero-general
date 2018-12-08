@@ -8,6 +8,7 @@ from keras.optimizers import *
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
+
 class MiniChessNNet():
     def __init__(self, game, args):
         # GPU Configuration
@@ -54,4 +55,4 @@ class MiniChessNNet():
         self.model._make_predict_function()
         self.graph = tf.get_default_graph()
 
-        self.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=Adam(args.lr))
+        self.model.compile(loss=['categorical_crossentropy', 'mean_squared_error'], optimizer=Adam(args.lr))
