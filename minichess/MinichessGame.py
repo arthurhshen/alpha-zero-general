@@ -283,9 +283,6 @@ class MinichessGame(Game):
             # current player is checkmate
             if (b._is_check(board, player)):
                 return(-1)
-            # other player is checkmate
-            if (b._is_check(board, -player)):
-                return(1)
             # stalemate
             else:
                 return 1e-8
