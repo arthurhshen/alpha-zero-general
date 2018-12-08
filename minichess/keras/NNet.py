@@ -11,13 +11,13 @@ from utils import *
 from NeuralNet import NeuralNet
 
 import argparse
-from .MinichessNNet import MiniChessNNet as minichessnnet
+from .MiniChessNNet import MiniChessNNet as minichessnnet
 
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
     'epochs': 100,
-    'batch_size': 256,
+    'batch_size': 64,
     'cuda': True,
     'num_channels': 256,
 })
