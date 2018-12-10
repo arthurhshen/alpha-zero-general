@@ -6,12 +6,12 @@ from utils import *
 args = dotdict({
     'numIters': 50,
     'numEps': 100,
-    'tempThreshold': 50,
+    'tempThreshold': 100,
     'updateThreshold': 0.5,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 500,
+    'numMCTSSims': 250,
 
-    'arenaCompare': 20,
+    'arenaCompare': 25,
     'cpuct': 1,
     'filter_draw_rate': 0.8,
 
