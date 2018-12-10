@@ -19,7 +19,7 @@ minimax_p1 = MinimaxPlayer(g, 1).select_move
 
 # nnet players
 n1 = NNet(g)
-n1.load_checkpoint('./temp/', 'temp.pth.tar')
+n1.load_checkpoint('./temp/', 'best.pth.tar')
 args1 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
 mcts1 = MCTS(g, n1, args1)
 
