@@ -4,9 +4,9 @@ from minichess.keras.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 50,
-    'numEps': 50,
-    'tempThreshold': 100,
+    'numIters': 100,
+    'numEps': 100,
+    'tempThreshold': 50,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 100,
