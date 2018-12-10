@@ -19,7 +19,7 @@ args = dotdict({
     'epochs': 100,
     'batch_size': 64,
     'cuda': True,
-    'num_channels': 512,
+    'num_channels': 256,
 })
 
 
